@@ -26,7 +26,8 @@ export const getRecommendations = async (
 ) => {
     // If chatHistory was passed as a string (legacy/single-context mode), move it to context
     const actualChatHistory = Array.isArray(chatHistory) ? chatHistory : [];
-    const actualContext = typeof chatHistory === "string" ? chatHistory : context;
+    const actualContext =
+        typeof chatHistory === "string" ? chatHistory : context;
 
     const response = await api.post("/recommend", {
         user_history: userHistory,
@@ -57,6 +58,10 @@ export const runEvaluation = async () => {
     const response = await api.post("/evaluation/run");
     return response.data;
 };
+
+// Aliases for components using old names
+export const getEvaluationResults = getEvalResults;
+export const runFullEvaluation = runEvaluation;
 
 export const getPipelineDemo = async (userId) => {
     const response = await api.get(`/demo/pipeline?user_id=${userId}`);
