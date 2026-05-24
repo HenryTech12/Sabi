@@ -74,18 +74,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Improved CORS for development
+# Production CORS: Allow all origins for the hackathon
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://sabi-rose.vercel.app",
-        "https://sabi-rose-git-master-rose.vercel.app",
-        "https://sabi-git-master-henrys-projects-d4e35830.vercel.app",
-        "https://sabi-lva7tg3oa-henrys-projects-d4e35830.vercel.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
