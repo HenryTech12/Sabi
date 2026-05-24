@@ -77,11 +77,20 @@ app = FastAPI(
 # Production CORS: Allow all origins for the hackathon
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://sabi-rose.vercel.app",
+        "https://sabi-mna8.onrender.com",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Also allow all origins as a fallback if the above list missed any subdomains
+# NOTE: allow_origins=["*"] and allow_credentials=True are mutually exclusive.
+# For debugging, we use explicit list above. If you need total freedom:
+# app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 @app.get("/")
 def root():

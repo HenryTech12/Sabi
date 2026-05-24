@@ -1,16 +1,17 @@
 import axios from "axios";
 
-// In development, use Vite's proxy (/api) to avoid CORS issues
-// In production, use the environment variable
-const BASE_URL = import.meta.env.VITE_API_URL || "/api";
-
-// Fallback for Vercel deployments where VITE_API_URL might not be set
+// Fallback for Vercel deployments
 const getBaseUrl = () => {
+    // 1. If an explicit environment variable is set, use it
     if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    
+    // 2. On Vercel, we use the /api proxy configured in vercel.json
+    // This avoids CORS issues entirely as it becomes a Same-Origin request
     if (window.location.hostname.includes("vercel.app")) {
-        // You should replace this with your actual Render/Backend URL
-        return "https://sabi-engine.onrender.com"; 
+        return "/api";
     }
+    
+    // 3. Default for local development (Vite proxy)
     return "/api";
 };
 

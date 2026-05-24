@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://sabi-engine.onrender.com/:path*"
+            "destination": "https://sabi-mna8.onrender.com/:path*"
         },
         { "source": "/(.*)", "destination": "/index.html" }
     ]
