@@ -48,26 +48,6 @@ export const getItems = async () => {
     return response.data;
 };
 
-export const getEvaluationResults = async () => {
-    const response = await api.get("/evaluation/results");
-    return response.data;
-};
-
-export const runFullEvaluation = async () => {
-    const response = await api.post("/evaluation/run");
-    return response.data;
-};
-
-export const getPipelineDemo = async (userId) => {
-    const response = await api.get(`/demo/pipeline?user_id=${userId}`);
-    return response.data;
-};
-
-export const getColdStartDemo = async () => {
-    const response = await api.get("/demo/cold-start");
-    return response.data;
-};
-
 export const getEvalResults = async () => {
     const response = await api.get("/evaluation/results");
     return response.data;
@@ -78,13 +58,13 @@ export const runEvaluation = async () => {
     return response.data;
 };
 
-export const getColdStartDemo = async () => {
-    const response = await api.get("/demo/cold-start");
+export const getPipelineDemo = async (userId) => {
+    const response = await api.get(`/demo/pipeline?user_id=${userId}`);
     return response.data;
 };
 
-export const getPipelineDemo = async (userId) => {
-    const response = await api.get(`/demo/pipeline?user_id=${userId}`);
+export const getColdStartDemo = async () => {
+    const response = await api.get("/demo/cold-start");
     return response.data;
 };
 
