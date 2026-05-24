@@ -1,8 +1,8 @@
 {
-    "rewrite": [
+    "rewrites": [
         {
-            "source": "/api/(.*)",
-            "destination": "https://sabi-engine.onrender.com/$1"
+            "source": "/api/:path*",
+            "destination": "https://sabi-engine.onrender.com/:path*"
         },
         { "source": "/(.*)", "destination": "/index.html" }
     ]
