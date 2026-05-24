@@ -59,10 +59,6 @@ export const runEvaluation = async () => {
     return response.data;
 };
 
-// Aliases for components using old names
-export const getEvaluationResults = getEvalResults;
-export const runFullEvaluation = runEvaluation;
-
 export const getPipelineDemo = async (userId) => {
     const response = await api.get(`/demo/pipeline?user_id=${userId}`);
     return response.data;

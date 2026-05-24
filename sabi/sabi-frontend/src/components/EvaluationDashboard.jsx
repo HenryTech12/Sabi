@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getEvaluationResults, runFullEvaluation } from "../utils/api";
+import { getEvalResults, runEvaluation as runEvalApi } from "../utils/api";
 import {
     Play,
     BarChart3,
@@ -17,7 +17,7 @@ const EvaluationDashboard = () => {
 
     const fetchResults = async () => {
         try {
-            const data = await getEvaluationResults();
+            const data = await getEvalResults();
             setResults(data);
         } catch (err) {
             if (err.response && err.response.status === 404) {
@@ -39,7 +39,7 @@ const EvaluationDashboard = () => {
         setLoading(true);
         setError(null);
         try {
-            const data = await runFullEvaluation();
+            const data = await runEvalApi();
             setResults(data);
         } catch (err) {
             setError(
