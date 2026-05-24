@@ -4,8 +4,18 @@ import axios from "axios";
 // In production, use the environment variable
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
+// Fallback for Vercel deployments where VITE_API_URL might not be set
+const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    if (window.location.hostname.includes("vercel.app")) {
+        // You should replace this with your actual Render/Backend URL
+        return "https://sabi-engine.onrender.com"; 
+    }
+    return "/api";
+};
+
 const api = axios.create({
-    baseURL: BASE_URL,
+    baseURL: getBaseUrl(),
     headers: { "Content-Type": "application/json" },
     timeout: 60000, // 60 seconds — LLM calls take time
 });

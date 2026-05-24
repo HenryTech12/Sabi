@@ -1,0 +1,9 @@
+{
+    "rewrite": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://sabi-engine.onrender.com/$1"
+        },
+        { "source": "/(.*)", "destination": "/index.html" }
+    ]
+}
