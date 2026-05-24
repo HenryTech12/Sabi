@@ -21,6 +21,11 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 # Load .env from the same directory as main.py
 load_dotenv(os.path.join(base_dir, ".env"))
 
+if not os.getenv("OPENAI_API_KEY"):
+    print("CRITICAL: OPENAI_API_KEY not found in environment!")
+else:
+    print(f"DEBUG: OPENAI_API_KEY found (starts with {os.getenv('OPENAI_API_KEY')[:7]}...)")
+
 # Global state for pre-loaded data
 app_data = {}
 
@@ -152,6 +157,9 @@ async def get_cold_start_demo():
     try:
         return await run_cold_start_demo()
     except Exception as e:
+        import traceback
+        print(f"ERROR in cold-start demo: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Cold start demo failed: {str(e)}")
 
 @app.get("/demo/pipeline", response_model=PipelineDemoResponse)
@@ -159,4 +167,7 @@ async def get_pipeline_demo(user_id: str):
     try:
         return await run_full_pipeline_demo(user_id)
     except Exception as e:
+        import traceback
+        print(f"ERROR in pipeline demo: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Pipeline demo failed: {str(e)}")

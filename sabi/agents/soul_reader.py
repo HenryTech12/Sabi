@@ -130,8 +130,16 @@ async def build_soul_profile(user_history: UserHistory) -> SoulProfile:
             flat["cultural_affinity_score"] = to_float(data.get("cultural_affinity_score") or 0.8)
             
             # Cleanup list types
-            if isinstance(flat["signature_phrases"], str): flat["signature_phrases"] = [flat["signature_phrases"]]
-            if isinstance(flat["dialect_markers"], str): flat["dialect_markers"] = [flat["dialect_markers"]]
+            if isinstance(flat.get("signature_phrases"), str): flat["signature_phrases"] = [flat["signature_phrases"]]
+            if not flat.get("signature_phrases"): flat["signature_phrases"] = []
+            
+            if isinstance(flat.get("dialect_markers"), str): flat["dialect_markers"] = [flat["dialect_markers"]]
+            if not flat.get("dialect_markers"): flat["dialect_markers"] = []
+            
+            # Ensure float types
+            for field in ["avg_rating", "rating_variance", "forgiveness_factor", "novelty_seeking", "cultural_sensitivity", "cultural_affinity_score"]:
+                if field in flat:
+                    flat[field] = to_float(flat[field])
             
             # Enum mapping for dialect_persona if LLM used descriptive terms
             persona_map = {
@@ -218,8 +226,16 @@ async def build_soul_profile(user_history: UserHistory) -> SoulProfile:
             flat["dialect_persona"] = data.get("dialect_persona") or iden.get("cultural_tone") or "pidgin_lagos"
             flat["cultural_affinity_score"] = to_float(data.get("cultural_affinity_score") or 0.8)
             
-            if isinstance(flat["signature_phrases"], str): flat["signature_phrases"] = [flat["signature_phrases"]]
-            if isinstance(flat["dialect_markers"], str): flat["dialect_markers"] = [flat["dialect_markers"]]
+            if isinstance(flat.get("signature_phrases"), str): flat["signature_phrases"] = [flat["signature_phrases"]]
+            if not flat.get("signature_phrases"): flat["signature_phrases"] = []
+            
+            if isinstance(flat.get("dialect_markers"), str): flat["dialect_markers"] = [flat["dialect_markers"]]
+            if not flat.get("dialect_markers"): flat["dialect_markers"] = []
+
+            # Ensure float types
+            for field in ["avg_rating", "rating_variance", "forgiveness_factor", "novelty_seeking", "cultural_sensitivity", "cultural_affinity_score"]:
+                if field in flat:
+                    flat[field] = to_float(flat[field])
             
             valid_personas = ["pidgin_lagos", "hausa_kano", "igbo_east", "southsouth", "neutral_abuja"]
             if flat["dialect_persona"] not in valid_personas:

@@ -1,7 +1,8 @@
 import json
 import os
+import traceback
 from openai import AsyncOpenAI
-from sabi.models.schemas import UserHistory, SoulProfile, RecommendResponse
+from sabi.models.schemas import UserHistory, SoulProfile, RecommendResponse, RecommendationItem, Item
 from sabi.agents.soul_reader import build_soul_profile
 from sabi.agents.voice_mapper import get_voice_instruction, get_openai_client
 
@@ -112,67 +113,108 @@ async def get_recommendations(
     reviewed_titles = {r.title for r in user_history.reviewed_items}
     available_items = [i for i in items_db if i["title"] not in reviewed_titles]
     
+    # Limit number of candidate items sent to LLM to prevent context overflow or high latency
+    # In a real app, this would be a vector search result.
+    if len(available_items) > 100:
+        import random
+        # Mix top community rated with some random ones for serendipity
+        top_rated = sorted(available_items, key=lambda x: x.get("avg_community_rating", 0), reverse=True)[:50]
+        others = [i for i in available_items if i not in top_rated]
+        available_items = top_rated + random.sample(others, min(len(others), 50))
+
     cold_start = len(user_history.reviewed_items) < 3
     client = get_openai_client()
 
     def parse_recommendation_response(raw_text, soul_profile, cold_start, context):
-        if "```" in raw_text:
-            raw_text = raw_text.split("```")[1]
-            if raw_text.startswith("json"):
-                raw_text = raw_text[4:]
-        
-        result = json.loads(raw_text.strip())
-        
-        # 1. Heuristic to handle nested responses
-        if "recommendations" not in result:
-            for val in result.values():
-                if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict):
-                    if "rank" in val[0] or "item_id" in val[0] or "item" in val[0]:
-                        result["recommendations"] = val
-                        break
-        
-        # 2. Fix items - map IDs back to full items
-        cleaned_recommendations = []
-        if "recommendations" in result and isinstance(result["recommendations"], list):
-            for rec in result["recommendations"]:
-                item_data = rec.get("item")
-                item_id = None
-                
-                if isinstance(item_data, dict):
-                    item_id = item_data.get("item_id")
-                elif "item_id" in rec:
-                    item_id = rec["item_id"]
-                elif isinstance(item_data, str):
-                    item_id = item_data
-                
-                if item_id and item_id in items_by_id:
-                    rec["item"] = items_by_id[item_id]
-                elif not item_data:
-                    continue
-                
-                # Defaults
-                if "fit_score" not in rec: rec["fit_score"] = 0.5
-                if "predicted_rating" not in rec: rec["predicted_rating"] = 4.0
-                if "reason" not in rec: rec["reason"] = "Highly recommended for you."
-                if "reasoning_chain" not in rec: rec["reasoning_chain"] = ["Standard match."]
-                if "rank" not in rec: rec["rank"] = len(cleaned_recommendations) + 1
-                if "cold_start_flag" not in rec: rec["cold_start_flag"] = cold_start
-                
-                cleaned_recommendations.append(rec)
-        
-        result["recommendations"] = cleaned_recommendations
-        
-        # 3. Metadata Defaults
-        if "soul_profile_summary" not in result:
-            result["soul_profile_summary"] = f"Recommendations for a {soul_profile.personality_type} from {soul_profile.detected_region}."
-        if "dialect_used" not in result:
-            result["dialect_used"] = soul_profile.dialect_persona
-        if "cold_start_applied" not in result:
-            result["cold_start_applied"] = cold_start
-        if "context_applied" not in result:
-            result["context_applied"] = context or "not specified"
+        try:
+            if "```" in raw_text:
+                raw_text = raw_text.split("```")[1]
+                if raw_text.startswith("json"):
+                    raw_text = raw_text[4:]
             
-        return RecommendResponse(**result)
+            result = json.loads(raw_text.strip())
+            
+            # 1. Heuristic to handle nested responses
+            if "recommendations" not in result:
+                for val in result.values():
+                    if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict):
+                        if "rank" in val[0] or "item_id" in val[0] or "item" in val[0]:
+                            result["recommendations"] = val
+                            break
+            
+            # 2. Fix items - map IDs back to full items
+            cleaned_recommendations = []
+            if "recommendations" in result and isinstance(result["recommendations"], list):
+                for i, rec in enumerate(result["recommendations"]):
+                    if not isinstance(rec, dict): continue
+                    
+                    item_data = rec.get("item")
+                    item_id = rec.get("item_id")
+                    
+                    # Try to find the item in our database
+                    resolved_item = None
+                    if isinstance(item_data, dict):
+                        item_id = item_data.get("item_id")
+                    elif isinstance(item_data, str):
+                        # Some LLMs return item as a string title or ID
+                        item_id = item_data if item_id in items_by_id else None
+                    
+                    if item_id and item_id in items_by_id:
+                        resolved_item = items_by_id[item_id]
+                    
+                    # If we can't find it in our DB, we must ensure it matches Item schema
+                    # or just skip it to be safe.
+                    if not resolved_item:
+                        if isinstance(item_data, dict) and "title" in item_data:
+                            # Fill missing required fields for hallucinated items
+                            item_data.setdefault("item_id", f"hallucinated_{i}")
+                            item_data.setdefault("category", "movie")
+                            item_data.setdefault("genre", ["General"])
+                            item_data.setdefault("description", "A recommended title.")
+                            item_data.setdefault("avg_community_rating", 4.0)
+                            item_data.setdefault("is_nigerian", False)
+                            resolved_item = item_data
+                        else:
+                            continue # Skip unresolvable items
+                    
+                    rec["item"] = resolved_item
+                    
+                    # Robust float extraction
+                    def safe_float(val, default=0.5):
+                        if isinstance(val, (int, float)): return float(val)
+                        if isinstance(val, str):
+                            try:
+                                import re
+                                match = re.search(r"(\d+\.?\d*)", val)
+                                if match: return float(match.group(1))
+                            except: pass
+                        return default
+
+                    # Defaults for RecommendationItem fields
+                    rec["rank"] = rec.get("rank") or (len(cleaned_recommendations) + 1)
+                    rec["fit_score"] = safe_float(rec.get("fit_score"), 0.8)
+                    rec["predicted_rating"] = safe_float(rec.get("predicted_rating"), 4.0)
+                    rec["reason"] = str(rec.get("reason", "Highly recommended.")).strip()
+                    rec["reasoning_chain"] = rec.get("reasoning_chain", ["Based on profile match."])
+                    if not isinstance(rec["reasoning_chain"], list):
+                        rec["reasoning_chain"] = [str(rec["reasoning_chain"])]
+                    rec["cold_start_flag"] = bool(rec.get("cold_start_flag", cold_start))
+                    
+                    cleaned_recommendations.append(rec)
+            
+            result["recommendations"] = cleaned_recommendations
+            
+            # 3. Metadata Defaults
+            result["soul_profile_summary"] = str(result.get("soul_profile_summary") or f"Recommendations for a {soul_profile.personality_type} from {soul_profile.detected_region}.")
+            result["dialect_used"] = str(result.get("dialect_used") or soul_profile.dialect_persona)
+            result["cold_start_applied"] = bool(result.get("cold_start_applied", cold_start))
+            result["context_applied"] = str(result.get("context_applied") or context or "not specified")
+                
+            return RecommendResponse(**result)
+        except Exception as e:
+            print(f"DEBUG: Recommendation Parsing Error: {str(e)}")
+            traceback.print_exc()
+            raise e
 
     try:
         response = await client.chat.completions.create(
