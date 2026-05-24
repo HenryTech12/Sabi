@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getEvalResults, runEvaluation } from "../utils/api";
 import { Play, Target, BarChart3, Database } from "lucide-react";
-import LoadingSpinner from "../components/LoadingSpinner";
 import ColdStartDemo from "../components/ColdStartDemo";
 import PipelineVisualizer from "../components/PipelineVisualizer";
-import EvaluationDashboard from "../components/EvaluationDashboard";
 
 const EvaluationPage = () => {
     const [activeTab, setActiveTab] = useState("eval");
