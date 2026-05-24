@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getEvalResults, runEvaluation } from "../utils/api";
-import { Play, FileText, Target, BarChart3, Database } from "lucide-react";
+import { Play, Target, BarChart3, Database } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ColdStartDemo from "../components/ColdStartDemo";
 import PipelineVisualizer from "../components/PipelineVisualizer";
