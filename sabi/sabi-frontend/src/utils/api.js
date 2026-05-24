@@ -21,12 +21,18 @@ export const simulateReview = async (userHistory, item) => {
 export const getRecommendations = async (
     userHistory,
     chatHistory = [],
-    currentMessage = ""
+    currentMessage = "",
+    context = null
 ) => {
+    // If chatHistory was passed as a string (legacy/single-context mode), move it to context
+    const actualChatHistory = Array.isArray(chatHistory) ? chatHistory : [];
+    const actualContext = typeof chatHistory === "string" ? chatHistory : context;
+
     const response = await api.post("/recommend", {
         user_history: userHistory,
-        chat_history: chatHistory,
+        chat_history: actualChatHistory,
         current_message: currentMessage,
+        context: actualContext,
         n_recommendations: 10,
     });
     return response.data;
@@ -39,6 +45,26 @@ export const getPersonas = async () => {
 
 export const getItems = async () => {
     const response = await api.get("/items");
+    return response.data;
+};
+
+export const getEvaluationResults = async () => {
+    const response = await api.get("/evaluation/results");
+    return response.data;
+};
+
+export const runFullEvaluation = async () => {
+    const response = await api.post("/evaluation/run");
+    return response.data;
+};
+
+export const getPipelineDemo = async (userId) => {
+    const response = await api.get(`/demo/pipeline?user_id=${userId}`);
+    return response.data;
+};
+
+export const getColdStartDemo = async () => {
+    const response = await api.get("/demo/cold-start");
     return response.data;
 };
 

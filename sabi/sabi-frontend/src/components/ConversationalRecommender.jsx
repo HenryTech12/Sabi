@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { getRecommendations } from "../utils/api";
 import { Send, User, Bot, Trash2, Sparkles, Star } from "lucide-react";
 import ItemCard from "./ItemCard";
 
@@ -29,20 +29,16 @@ const ConversationalRecommender = ({ userHistory }) => {
         setLoading(true);
 
         try {
-            const response = await axios.post(
-                "http://localhost:8000/recommend",
-                {
-                    user_history: userHistory,
-                    chat_history: updatedHistory,
-                    current_message: currentMessage,
-                    n_recommendations: 3,
-                }
+            const data = await getRecommendations(
+                userHistory,
+                updatedHistory,
+                currentMessage
             );
 
             const assistantMessage = {
                 role: "assistant",
-                content: response.data.reasoning,
-                recommendations: response.data.recommendations,
+                content: data.soul_profile_summary || data.reasoning || "Here are some matches for you:",
+                recommendations: data.recommendations,
             };
 
             setChatHistory([...updatedHistory, assistantMessage]);

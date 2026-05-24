@@ -1,3 +1,16 @@
+"""
+SABI Main Entry Point.
+
+This module initializes the FastAPI application, configures CORS for 
+production/development, and defines the core API routes for the SABI 
+behavioural engine.
+
+Key Features:
+- Lifespan events for pre-loading regional knowledge.
+- Multi-origin CORS support (Localhost, Vercel).
+- Automated agent orchestration for Recommendations, Simulation, and Demos.
+"""
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -15,6 +28,7 @@ from sabi.agents.recommender import get_recommendations
 from sabi.utils.evaluator import run_evaluation
 from sabi.agents.cold_start_demo import run_cold_start_demo
 from sabi.agents.pipeline_demo import run_full_pipeline_demo
+from sabi.utils.cloud_data import fetch_full_catalog, fetch_movielens_user_profiles
 
 # Get the directory where main.py is located
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,8 +77,13 @@ app = FastAPI(
 # Improved CORS for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False, # Must be False if allow_origins is ["*"]
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://sabi-rose.vercel.app",
+        "https://sabi-rose-git-master-rose.vercel.app",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -92,6 +111,8 @@ async def simulate_review_endpoint(request: SimulateReviewRequest):
         result = await simulate_review(request.user_history, request.item)
         return result
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Review Simulation Failed: {str(e)}")
 
 @app.post("/recommend", response_model=RecommendResponse)
@@ -105,6 +126,8 @@ async def recommend_endpoint(payload: RecommendRequest):
             payload.n_recommendations
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Recommendation Task Failed: {str(e)}")
 
 @app.get("/personas")
@@ -134,12 +157,17 @@ def health():
 # Evaluation Endpoints
 @app.get("/evaluation/results", response_model=EvaluationResponse)
 async def get_evaluation_results():
-    results_path = os.path.join(os.path.dirname(__file__), "evaluation", "results.json")
-    if not os.path.exists(results_path):
-        raise HTTPException(status_code=404, detail="No evaluation results found. Run POST /evaluation/run first")
-    
-    with open(results_path, "r") as f:
-        return json.load(f)
+    try:
+        results_path = os.path.join(os.path.dirname(__file__), "evaluation", "results.json")
+        if not os.path.exists(results_path):
+            raise HTTPException(status_code=404, detail="No evaluation results found. Run POST /evaluation/run first")
+        
+        with open(results_path, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/evaluation/run", response_model=EvaluationResponse)
 async def trigger_evaluation():
@@ -149,6 +177,8 @@ async def trigger_evaluation():
             raise HTTPException(status_code=500, detail=results["error"])
         return results
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {str(e)}")
 
 # Demo Endpoints
@@ -171,3 +201,37 @@ async def get_pipeline_demo(user_id: str):
         print(f"ERROR in pipeline demo: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Pipeline demo failed: {str(e)}")
+
+@app.get("/catalog")
+async def get_catalog(limit: int = 20):
+    """Returns live movie catalog from TMDB + Nollywood + local fallback"""
+    items = await fetch_full_catalog(limit=limit)
+    return {"count": len(items), "items": items}
+
+@app.get("/catalog/nollywood")
+async def get_nollywood():
+    """Returns only Nollywood titles - showcases Nigerian cultural layer"""
+    from sabi.utils.cloud_data import fetch_nollywood_movies
+    items = await fetch_nollywood_movies(limit=20)
+    return {"count": len(items), "items": items}
+
+@app.get("/users/sample")
+async def get_sample_users(n: int = 5):
+    """Returns sample user profiles from MovieLens with Nigerian personas"""
+    import asyncio
+    profiles = await asyncio.to_thread(
+        fetch_movielens_user_profiles, num_users=n
+    )
+    return {"count": len(profiles), "users": profiles}
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "engine": "SABI_Core",
+        "data_sources": {
+            "items": "TMDB API + Nollywood (fallback: items.json)",
+            "users": "MovieLens HuggingFace (fallback: sample_users.json)",
+            "priors": "TMDB Genre Trends (fallback: nigerian_priors.json)"
+        }
+    }

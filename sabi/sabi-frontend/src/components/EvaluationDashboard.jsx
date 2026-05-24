@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { getEvaluationResults, runFullEvaluation } from "../utils/api";
 import {
     Play,
     BarChart3,
@@ -17,10 +17,8 @@ const EvaluationDashboard = () => {
 
     const fetchResults = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:8000/evaluation/results"
-            );
-            setResults(response.data);
+            const data = await getEvaluationResults();
+            setResults(data);
         } catch (err) {
             if (err.response && err.response.status === 404) {
                 // Not run yet
@@ -41,10 +39,8 @@ const EvaluationDashboard = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.post(
-                "http://localhost:8000/evaluation/run"
-            );
-            setResults(response.data);
+            const data = await runFullEvaluation();
+            setResults(data);
         } catch (err) {
             setError(
                 "Evaluation failed: " +

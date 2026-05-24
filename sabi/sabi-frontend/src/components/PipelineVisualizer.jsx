@@ -293,6 +293,10 @@ const PipelineVisualizer = () => {
     }
 
     function renderStep4(output) {
+        if (!output || !output.recommendations) {
+            return <div className="p-6 text-slate-500 italic">No recommendations available</div>;
+        }
+        
         return (
             <div className="p-6 space-y-3">
                 {output.recommendations.slice(0, 3).map((rec, i) => (
@@ -301,10 +305,10 @@ const PipelineVisualizer = () => {
                         className="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm"
                     >
                         <span className="font-bold text-slate-900">
-                            {i + 1}. {rec.item.title}
+                            {i + 1}. {rec?.item?.title || "Untitled Item"}
                         </span>
                         <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">
-                            Score: {Math.round(rec.fit_score * 100)}%
+                            Score: {rec?.fit_score ? Math.round(rec.fit_score * 100) : 0}%
                         </span>
                     </div>
                 ))}
