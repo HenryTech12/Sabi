@@ -1,0 +1,2 @@
+['', 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip', 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python312\\DLLs', 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python312\\Lib', 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python312', 'C:\\Users\\DELL\\Documents\\BCT\\.venv', 'C:\\Users\\DELL\\Documents\\BCT\\.venv\\Lib\\site-packages']
+Loaded

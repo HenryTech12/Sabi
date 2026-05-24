@@ -1,0 +1,72 @@
+{
+    "Lagos": {
+        "top_genres": ["Crime", "Thriller", "Comedy", "Romance", "Action"],
+        "cultural_touchstones": [
+            "King of Boys",
+            "Gangs of Lagos",
+            "The Wedding Party"
+        ],
+        "themes": ["hustle", "power", "urban", "female_lead", "politics"],
+        "default_avg_rating": 3.9
+    },
+    "Kano": {
+        "top_genres": ["Epic", "Family", "Action", "Drama", "Historical"],
+        "cultural_touchstones": ["The Figurine", "Timbuktu", "The Godfather"],
+        "themes": ["family", "honour", "community", "faith", "tradition"],
+        "default_avg_rating": 3.4
+    },
+    "Enugu": {
+        "top_genres": ["Drama", "Thriller", "Crime", "Biographical", "Action"],
+        "cultural_touchstones": [
+            "Half of a Yellow Sun",
+            "Citation",
+            "Brotherhood"
+        ],
+        "themes": [
+            "ambition",
+            "excellence",
+            "resilience",
+            "against_odds",
+            "success"
+        ],
+        "default_avg_rating": 3.7
+    },
+    "Port Harcourt": {
+        "top_genres": ["Action", "Drama", "Comedy", "Romance", "Thriller"],
+        "cultural_touchstones": [
+            "Beasts of No Nation",
+            "Eyimofe",
+            "Gangs of Lagos"
+        ],
+        "themes": [
+            "community",
+            "brotherhood",
+            "resilience",
+            "warmth",
+            "survival"
+        ],
+        "default_avg_rating": 4.0
+    },
+    "Abuja": {
+        "top_genres": [
+            "Political",
+            "Thriller",
+            "Drama",
+            "Documentary",
+            "Prestige"
+        ],
+        "cultural_touchstones": [
+            "Parasite",
+            "Moonlight",
+            "A Tribe Called Judah"
+        ],
+        "themes": [
+            "power",
+            "politics",
+            "sophistication",
+            "cosmopolitan",
+            "prestige"
+        ],
+        "default_avg_rating": 3.6
+    }
+}

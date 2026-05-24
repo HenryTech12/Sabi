@@ -1,0 +1,155 @@
+export const personas = [
+    {
+        user_id: "usr_001",
+        name: "Chioma Okafor",
+        age: 28,
+        location: "Enugu",
+        occupation: "Entrepreneur",
+        reviewed_items: [
+            {
+                item_id: "mov_001",
+                title: "King of Boys",
+                category: "movie",
+                rating_given: 5.0,
+                review_text:
+                    "Nna this film is not a joke o. Kemi Adetiba sabi work. The way Eniola carried that role ehn, chai. Every scene had me at the edge. I have watched three times and I still dey discover new things. This is what Nigerian cinema should be every time.",
+                date: "2024-03-15",
+            },
+            {
+                item_id: "mov_005",
+                title: "Citation",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "The story needed to be told. Temi Otedola carried it well for a debut. The way they handled the power dynamics in academia — very real, very uncomfortable. Minus half star for the pacing in the second act but overall this film deserves more attention.",
+                date: "2024-01-20",
+            },
+            {
+                item_id: "mov_016",
+                title: "Black Panther",
+                category: "movie",
+                rating_given: 4.0,
+                review_text:
+                    "Good film, important film. The African aesthetics were beautiful even if some of it felt like what Americans imagine Africa to be. Chadwick Boseman God rest his soul was magnificent. The villain had better motivations than the hero which is rare.",
+                date: "2023-11-10",
+            },
+        ],
+    },
+    {
+        user_id: "usr_002",
+        name: "Musa Aliyu",
+        age: 35,
+        location: "Kano",
+        occupation: "Civil Servant",
+        reviewed_items: [
+            {
+                item_id: "mov_017",
+                title: "The Godfather",
+                category: "movie",
+                rating_given: 4.0,
+                review_text:
+                    "Wallahi this is a proper film about family and loyalty. The acting is what they call timeless. I have recommended it to many people. It shows how power corrupts even good people. The lesson for all of us is very clear.",
+                date: "2024-02-28",
+            },
+            {
+                item_id: "mov_002",
+                title: "Brotherhood",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "This Nigerian film surprised me very much. The action was good, the story of brothers who go different ways — it touches the heart. I appreciate that they showed Northern characters with respect. Very good production. I will watch again.",
+                date: "2023-12-05",
+            },
+        ],
+    },
+    {
+        user_id: "usr_003",
+        name: "Tunde Bakare",
+        age: 22,
+        location: "Lagos",
+        occupation: "Student",
+        reviewed_items: [
+            {
+                item_id: "mov_004",
+                title: "The Wedding Party",
+                category: "movie",
+                rating_given: 5.0,
+                review_text:
+                    "LMAO this film is Lagos coded and I am here for every second!! The aunties, the drama, the aso-ebi wahala — my family IS these people. Banky W and Adesua sweet me die. I don watch this film like 6 times and I go still watch am again no cap.",
+                date: "2024-04-01",
+            },
+            {
+                item_id: "mov_003",
+                title: "Gangs of Lagos",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "E don burst!!! Lagos rough life portrayed correct. The street energy was real real. Some of the dialogue was a bit forced but the action scenes ehn — Amazon money touch this film. Proud of our industry abeg.",
+                date: "2024-03-20",
+            },
+            {
+                item_id: "mov_023",
+                title: "Avengers Endgame",
+                category: "movie",
+                rating_given: 5.0,
+                review_text:
+                    "I cried in the cinema. CRIED. The I am Iron Man moment finished me completely. 10 years of MCU paid off in this film. No argument. 5 stars. If you give this less than 4 stars we cannot be friends.",
+                date: "2023-09-15",
+            },
+        ],
+    },
+    {
+        user_id: "usr_004",
+        name: "Amina Garba",
+        age: 31,
+        location: "Abuja",
+        occupation: "Policy Analyst",
+        reviewed_items: [
+            {
+                item_id: "mov_019",
+                title: "Parasite",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "A masterclass in social commentary wrapped in genre filmmaking. Bong Joon-ho did something genuinely unprecedented here. The class anxiety is universal — I saw Nigeria in every frame despite the Korean setting. The ending disturbed me for days. That is the mark of great cinema.",
+                date: "2024-01-08",
+            },
+            {
+                item_id: "mov_006",
+                title: "A Tribe Called Judah",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "Finally a Nigerian film that trusts its audience. Funke Akindele has levelled up considerably. The ensemble cast, the social stratification themes, the Lagos setting used with genuine intelligence — this is the Nollywood I have been waiting for. Minor issues with the third act but easily overlooked.",
+                date: "2024-02-14",
+            },
+        ],
+    },
+    {
+        user_id: "usr_005",
+        name: "Emeka Eze",
+        age: 19,
+        location: "Port Harcourt",
+        occupation: "Student",
+        reviewed_items: [
+            {
+                item_id: "mov_025",
+                title: "Spider-Man No Way Home",
+                category: "movie",
+                rating_given: 5.0,
+                review_text:
+                    "My brother this film is not of this world!! Three Spider-Men!! I was screaming in the cinema my people were looking at me like I mad. The nostalgia hit different. God when for Nigerian superhero film like this. 5 stars is not enough.",
+                date: "2024-03-30",
+            },
+            {
+                item_id: "mov_007",
+                title: "Chief Daddy",
+                category: "movie",
+                rating_given: 4.5,
+                review_text:
+                    "E be like say this film know my family personally!! The way they shared the inheritance ehn — e dey happen. RMD as Chief Daddy was perfect casting. The comedy was correct without being too much. Good feel good film for the holidays.",
+                date: "2023-12-28",
+            },
+        ],
+    },
+];

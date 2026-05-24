@@ -1,0 +1,364 @@
+{
+  "sample_count": 25,
+  "rmse": 1.123565752415051,
+  "avg_rouge": {
+    "rouge1": 0.0867,
+    "rouge2": 0.0084,
+    "rougeL": 0.0715
+  },
+  "rouge_1": 0.0867,
+  "rouge_2": 0.0084,
+  "rouge_l": 0.0715,
+  "per_sample_results": [
+    {
+      "sample_id": "yelp_001",
+      "user_id": "user_lagos_001",
+      "actual_rating": 4.0,
+      "predicted_rating": 5.0,
+      "actual_review": "This place was really solid. Clean environment, fast service.",
+      "predicted_review": "Omo this place too good abeg. Everything was correct.",
+      "rouge": {
+        "rouge1": 0.3333,
+        "rouge2": 0.125,
+        "rougeL": 0.3333
+      },
+      "rmse_contribution": 1.0
+    },
+    {
+      "sample_id": "yelp_002",
+      "user_id": "user_kano_002",
+      "actual_rating": 3.0,
+      "predicted_rating": 4.3,
+      "actual_review": "The food was okay but the wait time was too much.",
+      "predicted_review": "Kano Central Suya is an experience I must acknowledge. Wallahi, it was really good I must say. The suya here is well-prepared and quite authentic. Kai, the flavors are consistent and rich. Average experience overall, nothing special in terms of presentation, but the taste stands out. I recommend for my brothers who appreciate street food. To tell you the truth, it's worth a visit by Allah.",
+      "rouge": {
+        "rouge1": 0.1266,
+        "rouge2": 0.026,
+        "rougeL": 0.0759
+      },
+      "rmse_contribution": 1.6899999999999995
+    },
+    {
+      "sample_id": "yelp_003",
+      "user_id": "user_enugu_003",
+      "actual_rating": 5.0,
+      "predicted_rating": 5.0,
+      "actual_review": "Best Abacha in town! Very authentic taste.",
+      "predicted_review": "Chai, 042 Kitchen na the place to be! Correct vibes all around, I swear to God. The person wey cook this sabi work, everything dey sweet well well. Traditional Enugu delicacies wey go make you dey shout, 'God when!' This thing sweet o, I no fit lie. Ambience dey cozy, and e be like home. Correct!",
+      "rouge": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "rmse_contribution": 0.0
+    },
+    {
+      "sample_id": "yelp_004",
+      "user_id": "user_abuja_004",
+      "actual_rating": 2.0,
+      "predicted_rating": 4.5,
+      "actual_review": "Too expensive for the quality. Security was also quite rude.",
+      "predicted_review": "Wuse Luxury Lounge offers a top-notch experience in a prime location. It\u2019s a nice place for a weekend hangout. The ambiance is inviting and perfect for those who enjoy a bit of the nightlife scene. The service was on point, making the visit worthwhile. Though the prices are on the high side, the quality justifies it. Highly recommended for those in Maitama or Wuse looking for an upscale evening.",
+      "rouge": {
+        "rouge1": 0.0988,
+        "rouge2": 0.0253,
+        "rougeL": 0.0741
+      },
+      "rmse_contribution": 6.25
+    },
+    {
+      "sample_id": "yelp_005",
+      "user_id": "user_ph_005",
+      "actual_rating": 4.5,
+      "predicted_rating": 5.0,
+      "actual_review": "The seafood was very fresh. Port Harcourt standard!",
+      "predicted_review": "Garden City Seafood, my brother, na correct thing! The fish was on point. E be like say the taste dey remind me of home. No stories. I dey tell you, if you like seafood, this place go deliver. Pure Niger Delta vibes, abeg.",
+      "rouge": {
+        "rouge1": 0.1176,
+        "rouge2": 0.0,
+        "rougeL": 0.0784
+      },
+      "rmse_contribution": 0.25
+    },
+    {
+      "sample_id": "yelp_006",
+      "user_id": "user_lagos_002",
+      "actual_rating": 3.5,
+      "predicted_rating": 4.5,
+      "actual_review": "Decent spot but the music was too loud. I could barely hear my friend.",
+      "predicted_review": "Yellow Chilli e dey burst my head! The food quality no be small thing, e sweet me die. Abeg, if you dey look for good vibes and even better burgers, na here you go find am. Chai, dem continental dishes dey on point. I no go lie, na perfect spot to enjoy your corporate lunch. Lagos hustle fit tire person, but this place go ginger you well well. I recommend am, you go enjoy!",
+      "rouge": {
+        "rouge1": 0.1136,
+        "rouge2": 0.0,
+        "rougeL": 0.0682
+      },
+      "rmse_contribution": 1.0
+    },
+    {
+      "sample_id": "yelp_007",
+      "user_id": "user_abuja_002",
+      "actual_rating": 4.0,
+      "predicted_rating": 4.3,
+      "actual_review": "Clean and quiet. Perfect place to get some work done.",
+      "predicted_review": "The cafe was okay. The food quality could be improved, but the environment is good for working. Popcorn was dry, metaphorically speaking, food was not as fresh as expected. Nice spot for remote workers, especially in Maitama. The ambiance is calm and suits a professional setting. Overall, not bad if you need a quiet workspace.",
+      "rouge": {
+        "rouge1": 0.0923,
+        "rouge2": 0.0,
+        "rougeL": 0.0615
+      },
+      "rmse_contribution": 0.0899999999999999
+    },
+    {
+      "sample_id": "yelp_008",
+      "user_id": "user_kano_003",
+      "actual_rating": 4.5,
+      "predicted_rating": 4.4,
+      "actual_review": "Masha Allah, the Masa here is top tier.",
+      "predicted_review": "Good variations of local dishes. Wallahi, the food quality at Kano Gateway Cafe is impressive. To tell you the truth, their northern snacks are well-prepared and fresh. I recommend for my brothers who enjoy traditional flavors. Kai, it was really good I must say. By Allah, it's a great spot for quick bites with family.",
+      "rouge": {
+        "rouge1": 0.0923,
+        "rouge2": 0.0,
+        "rougeL": 0.0615
+      },
+      "rmse_contribution": 0.009999999999999929
+    },
+    {
+      "sample_id": "yelp_009",
+      "user_id": "user_ph_002",
+      "actual_rating": 2.5,
+      "predicted_rating": 4.2,
+      "actual_review": "The AC wasn't working and they weren't even apologetic about it.",
+      "predicted_review": "Oil Mill Lounge, my brother, convenient for chilling after a long day. E be like say their local music dey ginger me well. This one na correct thing, small chops dey and drinks dey flow. God when I go come back again. Nice place for some relaxation.",
+      "rouge": {
+        "rouge1": 0.0333,
+        "rouge2": 0.0,
+        "rougeL": 0.0333
+      },
+      "rmse_contribution": 2.8900000000000006
+    },
+    {
+      "sample_id": "yelp_010",
+      "user_id": "user_enugu_002",
+      "actual_rating": 5.0,
+      "predicted_rating": 4.1,
+      "actual_review": "I really enjoyed the atmosphere. It felt like home.",
+      "predicted_review": "Chai, Nike Lake Resort dey sweet o. But nna, always crowded on weekends. Crowd management na issue. Scenic views no fit cover that one. Quality dey there sha. I go still recommend, but avoid weekends if you no like crowd.",
+      "rouge": {
+        "rouge1": 0.0816,
+        "rouge2": 0.0,
+        "rougeL": 0.0816
+      },
+      "rmse_contribution": 0.8100000000000006
+    },
+    {
+      "sample_id": "yelp_011",
+      "user_id": "user_lagos_003",
+      "actual_rating": 4.0,
+      "predicted_rating": 4.7,
+      "actual_review": "Solid pepper soup. Not too spicy, just how I like it.",
+      "predicted_review": "Sailor's Lounge na cultural haven for Lekki. E dey for waterfront, the thing burst my head! The seafood sweet me no be small thing. I no go lie, e dey give that Lagos Island vibe. Amazing plays na wetin I dey always find, and this place no fall hand. Omo, if you dey Lagos, abeg try am. E go sweet you!",
+      "rouge": {
+        "rouge1": 0.0274,
+        "rouge2": 0.0,
+        "rougeL": 0.0274
+      },
+      "rmse_contribution": 0.49000000000000027
+    },
+    {
+      "sample_id": "yelp_012",
+      "user_id": "user_abuja_003",
+      "actual_rating": 3.0,
+      "predicted_rating": 4.3,
+      "actual_review": "The place is beautiful but the service needs help.",
+      "predicted_review": "Sky Bar Abuja offers a stunning view of the city. The experience is quite unique, especially in the evening. Good place to catch a movie of the cityscape, if you get what I mean. The ambiance is relaxed, perfect for winding down after a busy day. Service is efficient, but not intrusive. Overall, a great spot to enjoy Abuja from above.",
+      "rouge": {
+        "rouge1": 0.1714,
+        "rouge2": 0.0,
+        "rougeL": 0.1143
+      },
+      "rmse_contribution": 1.6899999999999995
+    },
+    {
+      "sample_id": "yelp_013",
+      "user_id": "user_kano_004",
+      "actual_rating": 4.5,
+      "predicted_rating": 4.7,
+      "actual_review": "Very respectful staff and the food was delicious.",
+      "predicted_review": "To tell you the truth, the experience at Emir's Kitchen was delightful. By Allah, the royal recipes reminded me of our rich heritage. Best shopping in Kano. It was really good I must say. Kai, if you want authentic traditional dishes, I recommend for my brothers. Wallahi, you won't regret visiting. A great place for family gatherings.",
+      "rouge": {
+        "rouge1": 0.0597,
+        "rouge2": 0.0,
+        "rougeL": 0.0597
+      },
+      "rmse_contribution": 0.04000000000000007
+    },
+    {
+      "sample_id": "yelp_014",
+      "user_id": "user_ph_003",
+      "actual_rating": 2.0,
+      "predicted_rating": 3.8,
+      "actual_review": "I was disappointed. The food was cold when it arrived.",
+      "predicted_review": "The place dey okay. Facility e be like say na kinda old, but the grill dey correct. My brother, you fit enjoy the steak, e still okay. For Port Harcourt, with oil money, this one na something you fit try. E no be the best, but e dey do the job.",
+      "rouge": {
+        "rouge1": 0.0328,
+        "rouge2": 0.0,
+        "rougeL": 0.0328
+      },
+      "rmse_contribution": 3.2399999999999993
+    },
+    {
+      "sample_id": "yelp_015",
+      "user_id": "user_enugu_004",
+      "actual_rating": 4.0,
+      "predicted_rating": 4.6,
+      "actual_review": "The garden area is so peaceful. Their small chops are decent.",
+      "predicted_review": "Hub of Enugu city life. The person wey cook this sabi work. I swear to God, this place get lush greenery. Enugu Garden Cafe dey cool, the outdoor vibes sweet o. Value for money dey here, nna. Chai, make you visit.",
+      "rouge": {
+        "rouge1": 0.0769,
+        "rouge2": 0.0,
+        "rougeL": 0.0769
+      },
+      "rmse_contribution": 0.3599999999999996
+    },
+    {
+      "sample_id": "yelp_016",
+      "user_id": "user_lagos_004",
+      "actual_rating": 4.5,
+      "predicted_rating": 5.0,
+      "actual_review": "Their Jollof is arguably the best in Lagos island. No capping.",
+      "predicted_review": "Omo, Island Kitchen na masterpiece! E dey by the lagoon, so the experience no be small thing, I no go lie. The thing burst my head, see as the food sweet me. Chai! Abeg, if you dey Lagos, this place na where you should visit. No Lagos traffic wahala fit stop me from coming back here. Everyone should visit.",
+      "rouge": {
+        "rouge1": 0.1143,
+        "rouge2": 0.0,
+        "rougeL": 0.0857
+      },
+      "rmse_contribution": 0.25
+    },
+    {
+      "sample_id": "yelp_017",
+      "user_id": "user_abuja_005",
+      "actual_rating": 3.5,
+      "predicted_rating": 4.8,
+      "actual_review": "Standard Abuja cafe. Good coffee but price is steep.",
+      "predicted_review": "Maitama Bistro dey give that perfect fun vibe. Truly a great spot for hanging out, especially if you're in Wuse or Maitama. The international dishes dey very satisfying, and the atmosphere just makes it better. Perfect for a casual outing or even a quick business chat. Great for go-karting vibes, if you know what I mean. Definitely a place I'll visit again. No dull moments here.",
+      "rouge": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "rmse_contribution": 1.6899999999999995
+    },
+    {
+      "sample_id": "yelp_018",
+      "user_id": "user_kano_005",
+      "actual_rating": 5.0,
+      "predicted_rating": 4.7,
+      "actual_review": "Best Tuwo Shinkafa in the state. Very consistent.",
+      "predicted_review": "Rich history in those walls. Sabo Traditional, wallahi, it was really good I must say. The flavors, kai, they remind me of home. Generous portions indeed, a true reflection of our Northern hospitality. The environment, by Allah, is welcoming and culturally enriched. To tell you the truth, I recommend for my brothers and family. This place brings our community together.",
+      "rouge": {
+        "rouge1": 0.0588,
+        "rouge2": 0.0,
+        "rougeL": 0.0588
+      },
+      "rmse_contribution": 0.0899999999999999
+    },
+    {
+      "sample_id": "yelp_019",
+      "user_id": "user_ph_004",
+      "actual_rating": 3.0,
+      "predicted_rating": 4.8,
+      "actual_review": "The place is okay for a quick drink but don't expect much.",
+      "predicted_review": "My brother, D-Line Chills na correct place for relaxment. So much fun dey as you fit just hang out with family. E be like say the atmosphere just dey calm and welcoming. I dey tell you, this one na the kind place you go enjoy evening vibes. God when, I go fit come back and enjoy again. If you dey PH, you need to check am out.",
+      "rouge": {
+        "rouge1": 0.0988,
+        "rouge2": 0.0,
+        "rougeL": 0.0741
+      },
+      "rmse_contribution": 3.2399999999999993
+    },
+    {
+      "sample_id": "yelp_020",
+      "user_id": "user_enugu_005",
+      "actual_rating": 4.0,
+      "predicted_rating": 4.3,
+      "actual_review": "Very affordable and the food portion is huge.",
+      "predicted_review": "042 Fast Food. Quick service, heavy portions. Good for weekend shopping. This thing sweet o. Value for money, nna. I swear to God, try am.",
+      "rouge": {
+        "rouge1": 0.1212,
+        "rouge2": 0.0,
+        "rougeL": 0.1212
+      },
+      "rmse_contribution": 0.0899999999999999
+    },
+    {
+      "sample_id": "yelp_021",
+      "user_id": "user_lagos_005",
+      "actual_rating": 5.0,
+      "predicted_rating": 4.7,
+      "actual_review": "I will keep coming back. Everything was just perfect.",
+      "predicted_review": "Ah, The Place Lekki e dey hot! From the moment I enter the restaurant, the vibe just dey burst my head. Omo, the jollof rice and asun combo na die, e sweet me no be small thing. The music and lights dey make you feel like you dey club sef, chai! I no go lie, the traffic to reach there na wah, but once you dey inside, you go forget everything. This place be the perfect blend of Lagos hustle and relaxation. Abeg, if you dey look for somewhere with Nigerian fusion and good time, this na the place. Scary but fun experience in a good way. Na so.",
+      "rouge": {
+        "rouge1": 0.0678,
+        "rouge2": 0.0,
+        "rougeL": 0.0508
+      },
+      "rmse_contribution": 0.0899999999999999
+    },
+    {
+      "sample_id": "yelp_022",
+      "user_id": "user_abuja_006",
+      "actual_rating": 2.5,
+      "predicted_rating": 3.6,
+      "actual_review": "Waiters were ignoring us for half an hour.",
+      "predicted_review": "Garki Grill House does deliver on the grill vibes, though not exceptional. It's a decent spot for a casual hangout in Abuja. The meat is well-cooked, but the menu feels a bit stuck in the past. More variety could elevate the experience. Service was adequate, but nothing special stood out. Overall, a good option if you\u2019re around Garki but not worth a special trip.",
+      "rouge": {
+        "rouge1": 0.0267,
+        "rouge2": 0.0,
+        "rougeL": 0.0267
+      },
+      "rmse_contribution": 1.2100000000000002
+    },
+    {
+      "sample_id": "yelp_023",
+      "user_id": "user_kano_006",
+      "actual_rating": 4.0,
+      "predicted_rating": 5.0,
+      "actual_review": "Good for families. Very spacious.",
+      "predicted_review": "View from the top is spiritual. Wallahi, Kano Leisure Park is a breath of fresh air. By Allah, the green area is perfect for relaxation. To tell you the truth, it was really good I must say. I recommend for my brothers, it's a nice place for family gatherings. Kai, visiting this park feels like a blessing.",
+      "rouge": {
+        "rouge1": 0.0952,
+        "rouge2": 0.0328,
+        "rougeL": 0.0952
+      },
+      "rmse_contribution": 1.0
+    },
+    {
+      "sample_id": "yelp_024",
+      "user_id": "user_ph_006",
+      "actual_rating": 4.5,
+      "predicted_rating": 4.2,
+      "actual_review": "Real PH vibes. The music was correct.",
+      "predicted_review": "Classy environment in the market area, my brother. This one na correct thing for quick bites. E be like say the energy dey vibrant, perfect mix for a quick stopover. I dey tell you, the place fit well with our oil money vibe. God when next visit, I go try their special. No wahala, you go enjoy am for sure.",
+      "rouge": {
+        "rouge1": 0.0896,
+        "rouge2": 0.0,
+        "rougeL": 0.0597
+      },
+      "rmse_contribution": 0.0899999999999999
+    },
+    {
+      "sample_id": "yelp_025",
+      "user_id": "user_enugu_006",
+      "actual_rating": 3.0,
+      "predicted_rating": 5.0,
+      "actual_review": "It was just there. Nothing to write home about.",
+      "predicted_review": "The person wey cook this sabi work, I swear to God. Nature at its finest. The grill at Coal City sweet die, chai! Nna, this thing sweet o. I dey thankful say I fit enjoy such good food for Enugu. God when, I go come back.",
+      "rouge": {
+        "rouge1": 0.0364,
+        "rouge2": 0.0,
+        "rougeL": 0.0364
+      },
+      "rmse_contribution": 4.0
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+import axios from "axios";
+
+// In development, use Vite's proxy (/api) to avoid CORS issues
+// In production, use the environment variable
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
+const api = axios.create({
+    baseURL: BASE_URL,
+    headers: { "Content-Type": "application/json" },
+    timeout: 60000, // 60 seconds — LLM calls take time
+});
+
+export const simulateReview = async (userHistory, item) => {
+    const response = await api.post("/simulate-review", {
+        user_history: userHistory,
+        item: item,
+    });
+    return response.data;
+};
+
+export const getRecommendations = async (
+    userHistory,
+    chatHistory = [],
+    currentMessage = ""
+) => {
+    const response = await api.post("/recommend", {
+        user_history: userHistory,
+        chat_history: chatHistory,
+        current_message: currentMessage,
+        n_recommendations: 10,
+    });
+    return response.data;
+};
+
+export const getPersonas = async () => {
+    const response = await api.get("/personas");
+    return response.data;
+};
+
+export const getItems = async () => {
+    const response = await api.get("/items");
+    return response.data;
+};
+
+export const getEvalResults = async () => {
+    const response = await api.get("/evaluation/results");
+    return response.data;
+};
+
+export const runEvaluation = async () => {
+    const response = await api.post("/evaluation/run");
+    return response.data;
+};
+
+export const getColdStartDemo = async () => {
+    const response = await api.get("/demo/cold-start");
+    return response.data;
+};
+
+export const getPipelineDemo = async (userId) => {
+    const response = await api.get(`/demo/pipeline?user_id=${userId}`);
+    return response.data;
+};
+
+export default api;

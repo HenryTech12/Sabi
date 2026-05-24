@@ -1,0 +1,802 @@
+[
+    {
+        "sample_id": "yelp_001",
+        "user_id": "user_lagos_001",
+        "item_id": "item_023",
+        "actual_rating": 4.0,
+        "actual_review_text": "This place was really solid. Clean environment, fast service.",
+        "item": {
+            "item_id": "item_023",
+            "title": "Nok by Alara",
+            "category": "Restaurant",
+            "genre": ["Contemporary African"],
+            "description": "Sophisticated garden restaurant serving modern African cuisine.",
+            "avg_community_rating": 4.5,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_lagos_001",
+            "name": "Chidi",
+            "age": 28,
+            "location": "Lagos",
+            "reviewed_items": [
+                {
+                    "item_id": "item_001",
+                    "title": "Glo-Cafe",
+                    "category": "Restaurant",
+                    "rating_given": 5.0,
+                    "review_text": "Omo this place too good abeg. Everything was correct.",
+                    "date": "2023-01-15"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_002",
+        "user_id": "user_kano_002",
+        "item_id": "item_045",
+        "actual_rating": 3.0,
+        "actual_review_text": "The food was okay but the wait time was too much.",
+        "item": {
+            "item_id": "item_045",
+            "title": "Kano Central Suya",
+            "category": "Restaurant",
+            "genre": ["Street Food"],
+            "description": "Authentic Kano Suya experience.",
+            "avg_community_rating": 4.2,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_kano_002",
+            "name": "Musa",
+            "age": 35,
+            "location": "Kano",
+            "reviewed_items": [
+                {
+                    "item_id": "item_005",
+                    "title": "Maitama View",
+                    "category": "Restaurant",
+                    "rating_given": 3.0,
+                    "review_text": "Average experience. Nothing special but nothing bad either.",
+                    "date": "2023-02-10"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_003",
+        "user_id": "user_enugu_003",
+        "item_id": "item_012",
+        "actual_rating": 5.0,
+        "actual_review_text": "Best Abacha in town! Very authentic taste.",
+        "item": {
+            "item_id": "item_012",
+            "title": "042 Kitchen",
+            "category": "Restaurant",
+            "genre": ["Igbo Cuisine"],
+            "description": "Traditional Enugu delicacies served in a cozy environment.",
+            "avg_community_rating": 4.8,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_enugu_003",
+            "name": "Ebere",
+            "age": 24,
+            "location": "Enugu",
+            "reviewed_items": [
+                {
+                    "item_id": "item_009",
+                    "title": "Coal City Cafe",
+                    "category": "Cafe",
+                    "rating_given": 4.5,
+                    "review_text": "Correct vibes and good coffee.",
+                    "date": "2023-03-05"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_004",
+        "user_id": "user_abuja_004",
+        "item_id": "item_067",
+        "actual_rating": 2.0,
+        "actual_review_text": "Too expensive for the quality. Security was also quite rude.",
+        "item": {
+            "item_id": "item_067",
+            "title": "Wuse Luxury Lounge",
+            "category": "Entertainment",
+            "genre": ["Nightlife"],
+            "description": "High-end lounge in the heart of Abuja.",
+            "avg_community_rating": 3.5,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_abuja_004",
+            "name": "Zainab",
+            "age": 30,
+            "location": "Abuja",
+            "reviewed_items": [
+                {
+                    "item_id": "item_015",
+                    "title": "Jabi Lake Mall",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Nice place for a weekend hangout.",
+                    "date": "2023-04-12"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_005",
+        "user_id": "user_ph_005",
+        "item_id": "item_089",
+        "actual_rating": 4.5,
+        "actual_review_text": "The seafood was very fresh. Port Harcourt standard!",
+        "item": {
+            "item_id": "item_089",
+            "title": "Garden City Seafood",
+            "category": "Restaurant",
+            "genre": ["Seafood"],
+            "description": "Native delicacies from the Niger Delta.",
+            "avg_community_rating": 4.6,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_ph_005",
+            "name": "Tamuno",
+            "age": 42,
+            "location": "Port Harcourt",
+            "reviewed_items": [
+                {
+                    "item_id": "item_020",
+                    "title": "Bole King",
+                    "category": "Restaurant",
+                    "rating_given": 5.0,
+                    "review_text": "Bole and fish was on point. No stories.",
+                    "date": "2023-05-20"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_006",
+        "user_id": "user_lagos_002",
+        "item_id": "item_030",
+        "actual_rating": 3.5,
+        "actual_review_text": "Decent spot but the music was too loud. I could barely hear my friend.",
+        "item": {
+            "item_id": "item_030",
+            "title": "Yellow Chilli",
+            "category": "Restaurant",
+            "genre": ["Continental"],
+            "description": "Popular dining spot for corporate lunches.",
+            "avg_community_rating": 4.0,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_lagos_002",
+            "name": "Ade",
+            "age": 32,
+            "location": "Lagos",
+            "reviewed_items": [
+                {
+                    "item_id": "item_001",
+                    "title": "Hard Rock Cafe",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Good vibes and even better burgers.",
+                    "date": "2023-06-11"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_007",
+        "user_id": "user_abuja_002",
+        "item_id": "item_050",
+        "actual_rating": 4.0,
+        "actual_review_text": "Clean and quiet. Perfect place to get some work done.",
+        "item": {
+            "item_id": "item_050",
+            "title": "Salamander Cafe",
+            "category": "Cafe",
+            "genre": ["Workspace"],
+            "description": "Quiet cafe favored by remote workers.",
+            "avg_community_rating": 4.3,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_abuja_002",
+            "name": "Fatima",
+            "age": 27,
+            "location": "Abuja",
+            "reviewed_items": [
+                {
+                    "item_id": "item_008",
+                    "title": "Genesis Cinema",
+                    "category": "Entertainment",
+                    "rating_given": 3.5,
+                    "review_text": "Popcorn was dry but movie was okay.",
+                    "date": "2023-07-22"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_008",
+        "user_id": "user_kano_003",
+        "item_id": "item_044",
+        "actual_rating": 4.5,
+        "actual_review_text": "Masha Allah, the Masa here is top tier.",
+        "item": {
+            "item_id": "item_044",
+            "title": "Kano Gateway Cafe",
+            "category": "Cafe",
+            "genre": ["Northern Snacks"],
+            "description": "Quick bites and local beverages.",
+            "avg_community_rating": 4.1,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_kano_003",
+            "name": "Abubakar",
+            "age": 29,
+            "location": "Kano",
+            "reviewed_items": [
+                {
+                    "item_id": "item_011",
+                    "title": "Sabo Food Court",
+                    "category": "Restaurant",
+                    "rating_given": 4.0,
+                    "review_text": "Good variations of local dishes.",
+                    "date": "2023-08-30"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_009",
+        "user_id": "user_ph_002",
+        "item_id": "item_081",
+        "actual_rating": 2.5,
+        "actual_review_text": "The AC wasn't working and they weren't even apologetic about it.",
+        "item": {
+            "item_id": "item_081",
+            "title": "Oil Mill Lounge",
+            "category": "Entertainment",
+            "genre": ["Bar"],
+            "description": "Lively bar with local music.",
+            "avg_community_rating": 3.8,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_ph_002",
+            "name": "Blessing",
+            "age": 26,
+            "location": "Port Harcourt",
+            "reviewed_items": [
+                {
+                    "item_id": "item_022",
+                    "title": "Spar PH",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Convenient for shopping and small chops.",
+                    "date": "2023-09-18"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_010",
+        "user_id": "user_enugu_002",
+        "item_id": "item_014",
+        "actual_rating": 5.0,
+        "actual_review_text": "I really enjoyed the atmosphere. It felt like home.",
+        "item": {
+            "item_id": "item_014",
+            "title": "Nike Lake Resort",
+            "category": "Entertainment",
+            "genre": ["Outdoors"],
+            "description": "Scenic resort with lake views.",
+            "avg_community_rating": 4.5,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_enugu_002",
+            "name": "Ifeanyi",
+            "age": 31,
+            "location": "Enugu",
+            "reviewed_items": [
+                {
+                    "item_id": "item_007",
+                    "title": "Shoprite Enugu",
+                    "category": "Entertainment",
+                    "rating_given": 3.0,
+                    "review_text": "Always crowded on weekends.",
+                    "date": "2023-10-05"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_011",
+        "user_id": "user_lagos_003",
+        "item_id": "item_033",
+        "actual_rating": 4.0,
+        "actual_review_text": "Solid pepper soup. Not too spicy, just how I like it.",
+        "item": {
+            "item_id": "item_033",
+            "title": "Sailor's Lounge",
+            "category": "Restaurant",
+            "genre": ["Seafood"],
+            "description": "Waterfront dining in Lekki.",
+            "avg_community_rating": 4.2,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_lagos_003",
+            "name": "Funke",
+            "age": 25,
+            "location": "Lagos",
+            "reviewed_items": [
+                {
+                    "item_id": "item_002",
+                    "title": "Terra Kulture",
+                    "category": "Entertainment",
+                    "rating_given": 5.0,
+                    "review_text": "Cultural haven. Amazing plays!",
+                    "date": "2023-11-20"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_012",
+        "user_id": "user_abuja_003",
+        "item_id": "item_055",
+        "actual_rating": 3.0,
+        "actual_review_text": "The place is beautiful but the service needs help.",
+        "item": {
+            "item_id": "item_055",
+            "title": "Sky Bar Abuja",
+            "category": "Restaurant",
+            "genre": ["Rooftop"],
+            "description": "Panoramic views of the city.",
+            "avg_community_rating": 4.1,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_abuja_003",
+            "name": "Yinka",
+            "age": 33,
+            "location": "Abuja",
+            "reviewed_items": [
+                {
+                    "item_id": "item_006",
+                    "title": "Silverbird Galleria",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Good place to catch a movie.",
+                    "date": "2023-12-05"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_013",
+        "user_id": "user_kano_004",
+        "item_id": "item_041",
+        "actual_rating": 4.5,
+        "actual_review_text": "Very respectful staff and the food was delicious.",
+        "item": {
+            "item_id": "item_041",
+            "title": "Emir's Kitchen",
+            "category": "Restaurant",
+            "genre": ["Traditional"],
+            "description": "Royal recipes passed down generations.",
+            "avg_community_rating": 4.4,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_kano_004",
+            "name": "Hadiza",
+            "age": 22,
+            "location": "Kano",
+            "reviewed_items": [
+                {
+                    "item_id": "item_010",
+                    "title": "Ado Bayero Mall",
+                    "category": "Entertainment",
+                    "rating_given": 4.5,
+                    "review_text": "Best shopping in Kano.",
+                    "date": "2024-01-10"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_014",
+        "user_id": "user_ph_003",
+        "item_id": "item_083",
+        "actual_rating": 2.0,
+        "actual_review_text": "I was disappointed. The food was cold when it arrived.",
+        "item": {
+            "item_id": "item_083",
+            "title": "Trans Amadi Grill",
+            "category": "Restaurant",
+            "genre": ["Grill"],
+            "description": "Steaks and BBQ in industry hub.",
+            "avg_community_rating": 3.7,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_ph_003",
+            "name": "Joy",
+            "age": 29,
+            "location": "Port Harcourt",
+            "reviewed_items": [
+                {
+                    "item_id": "item_019",
+                    "title": "PH Club",
+                    "category": "Entertainment",
+                    "rating_given": 3.0,
+                    "review_text": "Kinda old but still okay for sports.",
+                    "date": "2024-02-15"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_015",
+        "user_id": "user_enugu_004",
+        "item_id": "item_016",
+        "actual_rating": 4.0,
+        "actual_review_text": "The garden area is so peaceful. Their small chops are decent.",
+        "item": {
+            "item_id": "item_016",
+            "title": "Enugu Garden Cafe",
+            "category": "Cafe",
+            "genre": ["Outdoor Dining"],
+            "description": "Lush greenery and calm vibes.",
+            "avg_community_rating": 4.2,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_enugu_004",
+            "name": "Nnamdi",
+            "age": 36,
+            "location": "Enugu",
+            "reviewed_items": [
+                {
+                    "item_id": "item_003",
+                    "title": "Polo Park Mall",
+                    "category": "Entertainment",
+                    "rating_given": 4.5,
+                    "review_text": "Hub of Enugu city life.",
+                    "date": "2024-03-01"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_016",
+        "user_id": "user_lagos_004",
+        "item_id": "item_036",
+        "actual_rating": 4.5,
+        "actual_review_text": "Their Jollof is arguably the best in Lagos island. No capping.",
+        "item": {
+            "item_id": "item_036",
+            "title": "Island Kitchen",
+            "category": "Restaurant",
+            "genre": ["Nigerian"],
+            "description": "Premium local dishes by the lagoon.",
+            "avg_community_rating": 4.4,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_lagos_004",
+            "name": "Tunde",
+            "age": 30,
+            "location": "Lagos",
+            "reviewed_items": [
+                {
+                    "item_id": "item_004",
+                    "title": "Nike Art Gallery",
+                    "category": "Entertainment",
+                    "rating_given": 5.0,
+                    "review_text": "A masterpiece! Everyone should visit.",
+                    "date": "2024-03-20"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_017",
+        "user_id": "user_abuja_005",
+        "item_id": "item_052",
+        "actual_rating": 3.5,
+        "actual_review_text": "Standard Abuja cafe. Good coffee but price is steep.",
+        "item": {
+            "item_id": "item_052",
+            "title": "Maitama Bistro",
+            "category": "Cafe",
+            "genre": ["Bistro"],
+            "description": "Modern bistro serving international dishes.",
+            "avg_community_rating": 4.0,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_abuja_005",
+            "name": "Amina",
+            "age": 26,
+            "location": "Abuja",
+            "reviewed_items": [
+                {
+                    "item_id": "item_016",
+                    "title": "Central Park Abuja",
+                    "category": "Entertainment",
+                    "rating_given": 4.5,
+                    "review_text": "Great for go-karting and fun.",
+                    "date": "2024-04-05"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_018",
+        "user_id": "user_kano_005",
+        "item_id": "item_047",
+        "actual_rating": 5.0,
+        "actual_review_text": "Best Tuwo Shinkafa in the state. Very consistent.",
+        "item": {
+            "item_id": "item_047",
+            "title": "Sabo Traditional",
+            "category": "Restaurant",
+            "genre": ["Northern Cuisine"],
+            "description": "Generous portions and authentic flavors.",
+            "avg_community_rating": 4.6,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_kano_005",
+            "name": "Usman",
+            "age": 40,
+            "location": "Kano",
+            "reviewed_items": [
+                {
+                    "item_id": "item_012",
+                    "title": "Gidan Makama",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Rich history in those walls.",
+                    "date": "2024-04-18"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_019",
+        "user_id": "user_ph_004",
+        "item_id": "item_088",
+        "actual_rating": 3.0,
+        "actual_review_text": "The place is okay for a quick drink but don't expect much.",
+        "item": {
+            "item_id": "item_088",
+            "title": "D-Line Chills",
+            "category": "Cafe",
+            "genre": ["Chills"],
+            "description": "Relaxed atmosphere for evening hangouts.",
+            "avg_community_rating": 3.9,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_ph_004",
+            "name": "Efe",
+            "age": 28,
+            "location": "Port Harcourt",
+            "reviewed_items": [
+                {
+                    "item_id": "item_018",
+                    "title": "Pleasure Park",
+                    "category": "Entertainment",
+                    "rating_given": 5.0,
+                    "review_text": "So much fun for families.",
+                    "date": "2024-05-10"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_020",
+        "user_id": "user_enugu_005",
+        "item_id": "item_018",
+        "actual_rating": 4.0,
+        "actual_review_text": "Very affordable and the food portion is huge.",
+        "item": {
+            "item_id": "item_018",
+            "title": "042 Fast Food",
+            "category": "Restaurant",
+            "genre": ["Fast Food"],
+            "description": "Quick service and heavy portions.",
+            "avg_community_rating": 4.1,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_enugu_005",
+            "name": "Ada",
+            "age": 23,
+            "location": "Enugu",
+            "reviewed_items": [
+                {
+                    "item_id": "item_008",
+                    "title": "Shoprite Enugu",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Good for weekend shopping.",
+                    "date": "2024-05-25"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_021",
+        "user_id": "user_lagos_005",
+        "item_id": "item_039",
+        "actual_rating": 5.0,
+        "actual_review_text": "I will keep coming back. Everything was just perfect.",
+        "item": {
+            "item_id": "item_039",
+            "title": "The Place Lekki",
+            "category": "Restaurant",
+            "genre": ["Nigerian Fusion"],
+            "description": "Dynamic restaurant and club.",
+            "avg_community_rating": 4.3,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_lagos_005",
+            "name": "Bisi",
+            "age": 27,
+            "location": "Lagos",
+            "reviewed_items": [
+                {
+                    "item_id": "item_003",
+                    "title": "Lekki Conservation Centre",
+                    "category": "Entertainment",
+                    "rating_given": 4.5,
+                    "review_text": "That canopy walk was scary but fun!",
+                    "date": "2024-06-01"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_022",
+        "user_id": "user_abuja_006",
+        "item_id": "item_058",
+        "actual_rating": 2.5,
+        "actual_review_text": "Waiters were ignoring us for half an hour.",
+        "item": {
+            "item_id": "item_058",
+            "title": "Garki Grill House",
+            "category": "Restaurant",
+            "genre": ["Grill"],
+            "description": "Community grill spot.",
+            "avg_community_rating": 3.6,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_abuja_006",
+            "name": "Bura",
+            "age": 31,
+            "location": "Abuja",
+            "reviewed_items": [
+                {
+                    "item_id": "item_018",
+                    "title": "Magic Land",
+                    "category": "Entertainment",
+                    "rating_given": 3.5,
+                    "review_text": "Rides are a bit old.",
+                    "date": "2024-06-15"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_023",
+        "user_id": "user_kano_006",
+        "item_id": "item_049",
+        "actual_rating": 4.0,
+        "actual_review_text": "Good for families. Very spacious.",
+        "item": {
+            "item_id": "item_049",
+            "title": "Kano Leisure Park",
+            "category": "Entertainment",
+            "genre": ["Plaza"],
+            "description": "Green area for relaxation.",
+            "avg_community_rating": 4.2,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_kano_006",
+            "name": "Garba",
+            "age": 38,
+            "location": "Kano",
+            "reviewed_items": [
+                {
+                    "item_id": "item_013",
+                    "title": "Dala Hill",
+                    "category": "Entertainment",
+                    "rating_given": 5.0,
+                    "review_text": "View from the top is spiritual.",
+                    "date": "2024-07-02"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_024",
+        "user_id": "user_ph_006",
+        "item_id": "item_085",
+        "actual_rating": 4.5,
+        "actual_review_text": "Real PH vibes. The music was correct.",
+        "item": {
+            "item_id": "item_085",
+            "title": "Mile 1 Market Cafe",
+            "category": "Cafe",
+            "genre": ["Quick Bites"],
+            "description": "Lively cafe in the market district.",
+            "avg_community_rating": 4.0,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_ph_006",
+            "name": "Sotonye",
+            "age": 33,
+            "location": "Port Harcourt",
+            "reviewed_items": [
+                {
+                    "item_id": "item_023",
+                    "title": "Polo Club PH",
+                    "category": "Entertainment",
+                    "rating_given": 4.0,
+                    "review_text": "Classy environment for evening drinks.",
+                    "date": "2024-07-20"
+                }
+            ]
+        }
+    },
+    {
+        "sample_id": "yelp_025",
+        "user_id": "user_enugu_006",
+        "item_id": "item_019",
+        "actual_rating": 3.0,
+        "actual_review_text": "It was just there. Nothing to write home about.",
+        "item": {
+            "item_id": "item_019",
+            "title": "Coal City Grill",
+            "category": "Restaurant",
+            "genre": ["Grill"],
+            "description": "Casual dining in New Haven.",
+            "avg_community_rating": 3.8,
+            "is_nigerian": true
+        },
+        "user_history": {
+            "user_id": "user_enugu_006",
+            "name": "Amaka",
+            "age": 29,
+            "location": "Enugu",
+            "reviewed_items": [
+                {
+                    "item_id": "item_010",
+                    "title": "Awhum Waterfall",
+                    "category": "Entertainment",
+                    "rating_given": 5.0,
+                    "review_text": "Nature at its finest.",
+                    "date": "2024-08-05"
+                }
+            ]
+        }
+    }
+]

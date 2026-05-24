@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --navy: #0f172a;
+    --green: #10b981;
+    --teal: #0d9488;
+    --light: #f8fafc;
+    --muted: #64748b;
+    --amber: #f59e0b;
+}
+
+@layer base {
+    body {
+        @apply bg-light text-navy font-sans antialiased selection:bg-green/30;
+    }
+}
+
+@layer components {
+    .thin-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-navy/10 rounded-full hover:bg-navy/20;
+    }
+}
+
+.animate-in {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-from-bottom {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation-name: fade-in;
+}
+.slide-in-from-bottom-4 {
+    animation-name: slide-in-from-bottom;
+}
