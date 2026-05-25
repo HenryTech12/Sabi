@@ -70,6 +70,8 @@ async def fetch_tmdb_movies(
                 "genre": _map_genre_ids(m.get("genre_ids", [])),
                 "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
                 "description": m.get("overview", ""),
+                "is_nigerian": False,
+                "is_african": False,
                 "popularity": m.get("popularity", 0),
                 "release_year": m.get("release_date", "")[:4],
                 "source": "tmdb"
@@ -115,6 +117,8 @@ async def fetch_nollywood_movies(limit: int = 10) -> list:
                 "genre": ["nigerian", "nollywood"] + _map_genre_ids(m.get("genre_ids", [])),
                 "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
                 "description": m.get("overview", ""),
+                "is_nigerian": True,
+                "is_african": True,
                 "release_year": m.get("release_date", "")[:4],
                 "source": "tmdb_nollywood"
             })
