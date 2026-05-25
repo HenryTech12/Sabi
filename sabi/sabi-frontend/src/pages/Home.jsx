@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Brain, Mic, TrendingUp, ChevronRight } from "lucide-react";
+import { Brain, Mic, TrendingUp, ChevronRight, Play } from "lucide-react";
 
 const Home = () => {
     const navigate = useNavigate();
@@ -44,6 +44,17 @@ const Home = () => {
                         >
                             Get Recommendations
                         </button>
+                        <a
+                            href="https://drive.google.com/file/d/1_C7NTmJpUzDJrfIHHKeFWz2Uwk9CXfrt/view?usp=sharing"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-white/70 hover:text-green px-6 py-4 transition-colors font-bold group"
+                        >
+                            <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-green group-hover:border-green transition-all">
+                                <Play className="w-4 h-4 fill-current" />
+                            </div>
+                            Watch Demo Video
+                        </a>
                     </div>
 
                     <div className="mt-12 flex items-center gap-6 opacity-60">
@@ -117,13 +128,17 @@ const Home = () => {
                     {/* Stats Bar */}
                     <div className="mt-20 bg-navy rounded-3xl p-8 flex flex-wrap justify-around items-center gap-8 shadow-2xl">
                         <div className="text-center">
-                            <p className="text-4xl font-black text-green">400+</p>
+                            <p className="text-4xl font-black text-green">
+                                400+
+                            </p>
                             <p className="text-[10px] text-muted uppercase font-bold tracking-widest mt-1">
                                 Personas
                             </p>
                         </div>
                         <div className="text-center border-l border-white/10 pl-8">
-                            <p className="text-4xl font-black text-white">LIVE</p>
+                            <p className="text-4xl font-black text-white">
+                                LIVE
+                            </p>
                             <p className="text-[10px] text-muted uppercase font-bold tracking-widest mt-1">
                                 TMDB Catalog
                             </p>
