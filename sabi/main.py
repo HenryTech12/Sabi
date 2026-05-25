@@ -30,10 +30,10 @@ from sabi.agents.cold_start_demo import run_cold_start_demo
 from sabi.agents.pipeline_demo import run_full_pipeline_demo
 from sabi.utils.cloud_data import fetch_full_catalog, fetch_movielens_user_profiles
 
-# Get the directory where main.py is located
-base_dir = os.path.dirname(os.path.abspath(__file__))
-# Load .env from the same directory as main.py
-load_dotenv(os.path.join(base_dir, ".env"))
+# Get the directory of the project root (one level up from sabi/)
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Load .env from the project root
+load_dotenv(os.path.join(project_root, ".env"))
 
 if not os.getenv("OPENAI_API_KEY"):
     print("CRITICAL: OPENAI_API_KEY not found in environment!")
