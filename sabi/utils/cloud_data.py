@@ -65,10 +65,10 @@ async def fetch_tmdb_movies(
         for m in data.get("results", [])[:limit]:
             movies.append({
                 "item_id": f"tmdb_{m['id']}",
-                "name": m.get("title", "Unknown"),
+                "title": m.get("title", "Unknown"),
                 "category": "Movie",
-                "tags": _map_genre_ids(m.get("genre_ids", [])),
-                "average_rating": round(m.get("vote_average", 3.0) / 2, 1),
+                "genre": _map_genre_ids(m.get("genre_ids", [])),
+                "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
                 "description": m.get("overview", ""),
                 "popularity": m.get("popularity", 0),
                 "release_year": m.get("release_date", "")[:4],
@@ -110,10 +110,10 @@ async def fetch_nollywood_movies(limit: int = 10) -> list:
         for m in data.get("results", [])[:limit]:
             nollywood.append({
                 "item_id": f"nollywood_{m['id']}",
-                "name": m.get("title", "Unknown"),
+                "title": m.get("title", "Unknown"),
                 "category": "Nollywood",
-                "tags": ["nigerian", "nollywood"] + _map_genre_ids(m.get("genre_ids", [])),
-                "average_rating": round(m.get("vote_average", 3.0) / 2, 1),
+                "genre": ["nigerian", "nollywood"] + _map_genre_ids(m.get("genre_ids", [])),
+                "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
                 "description": m.get("overview", ""),
                 "release_year": m.get("release_date", "")[:4],
                 "source": "tmdb_nollywood"
