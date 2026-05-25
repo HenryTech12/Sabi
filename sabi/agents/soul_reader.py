@@ -1,10 +1,7 @@
 import json
 import os
-from openai import AsyncOpenAI
 from sabi.models.schemas import UserHistory, SoulProfile
-
-def get_openai_client():
-    return AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from sabi.agents.voice_mapper import get_openai_client
 
 SOUL_READER_SYSTEM_PROMPT = """
 You are SABI's Soul Reader — the most important agent in the system.

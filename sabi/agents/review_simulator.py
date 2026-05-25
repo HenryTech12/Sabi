@@ -1,6 +1,5 @@
 import json
 import os
-from openai import AsyncOpenAI
 from sabi.models.schemas import UserHistory, Item, SoulProfile, SimulateReviewResponse
 from sabi.agents.soul_reader import build_soul_profile
 from sabi.agents.voice_mapper import get_voice_instruction, get_openai_client
