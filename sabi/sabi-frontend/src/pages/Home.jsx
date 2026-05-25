@@ -14,8 +14,9 @@ const Home = () => {
                 </div>
 
                 <div className="max-w-6xl mx-auto flex flex-col items-center text-center relative z-10">
-                    <div className="bg-green/20 text-green px-4 py-1 rounded-full text-sm font-bold border border-green/30 mb-6 uppercase tracking-widest">
-                        SABI Engine v1.0
+                    <div className="bg-green/10 text-green px-4 py-1 rounded-full text-sm font-bold border border-green/30 mb-6 uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-2 h-2 bg-green rounded-full animate-pulse"></span>
+                        SABI Engine v1.1 - Live Cloud Integrated
                     </div>
                     <h1 className="text-7xl md:text-8xl font-black mb-4 tracking-tighter">
                         SABI<span className="text-green">.</span>
@@ -25,8 +26,8 @@ const Home = () => {
                     </h2>
                     <p className="text-lg md:text-xl text-muted max-w-2xl mb-10 leading-relaxed">
                         The first AI that models Nigerian users as living
-                        psychological personalities — not static preference
-                        vectors. Built for culture, driven by soul.
+                        psychological personalities. Now streaming live from
+                        TMDB and MovieLens for real-world cultural deep-dives.
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-4">
@@ -43,6 +44,24 @@ const Home = () => {
                         >
                             Get Recommendations
                         </button>
+                    </div>
+
+                    <div className="mt-12 flex items-center gap-6 opacity-60">
+                        <span className="text-xs font-bold uppercase tracking-widest">
+                            Powered By
+                        </span>
+                        <div className="flex gap-4 grayscale brightness-200">
+                            {/* Small text labels instead of full logos for simplicity */}
+                            <span className="text-[10px] font-black border border-white/30 px-2 py-1 rounded">
+                                TMDB
+                            </span>
+                            <span className="text-[10px] font-black border border-white/30 px-2 py-1 rounded">
+                                HuggingFace
+                            </span>
+                            <span className="text-[10px] font-black border border-white/30 px-2 py-1 rounded">
+                                OpenAI
+                            </span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -98,15 +117,15 @@ const Home = () => {
                     {/* Stats Bar */}
                     <div className="mt-20 bg-navy rounded-3xl p-8 flex flex-wrap justify-around items-center gap-8 shadow-2xl">
                         <div className="text-center">
-                            <p className="text-4xl font-black text-green">5</p>
+                            <p className="text-4xl font-black text-green">400+</p>
                             <p className="text-[10px] text-muted uppercase font-bold tracking-widest mt-1">
                                 Personas
                             </p>
                         </div>
                         <div className="text-center border-l border-white/10 pl-8">
-                            <p className="text-4xl font-black text-white">50</p>
+                            <p className="text-4xl font-black text-white">LIVE</p>
                             <p className="text-[10px] text-muted uppercase font-bold tracking-widest mt-1">
-                                Movies & Items
+                                TMDB Catalog
                             </p>
                         </div>
                         <div className="text-center border-l border-white/10 pl-8">
