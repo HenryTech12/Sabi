@@ -171,7 +171,7 @@ REGION_ROTATION = [
     {"detected_region": "Abuja",        "dialect_persona": "neutral_abuja"},
 ]
 
-def fetch_movielens_user_profiles(
+async def fetch_movielens_user_profiles(
     num_users: int = 10,
     min_reviews: int = 3,
     stream_depth: int = 3000
@@ -182,22 +182,44 @@ def fetch_movielens_user_profiles(
     Rotates Nigerian regional personas across users.
     Falls back to sample_users.json if streaming fails.
     """
+    # Wrap in to_thread because load_dataset is a blocking synchronous call
+    return await asyncio.to_thread(
+        _fetch_movielens_user_profiles_sync, 
+        num_users, 
+        min_reviews, 
+        stream_depth
+    )
+
+def _fetch_movielens_user_profiles_sync(
+    num_users: int = 10,
+    min_reviews: int = 3,
+    stream_depth: int = 3000
+) -> list:
     try:
         print(f"[cloud_data] Streaming MovieLens data for {num_users} user profiles...")
 
+        # Load dataset DukeNLPGroup/movielens-100k
+        # This dataset uses Parquet and does not require trust_remote_code
         dataset = load_dataset(
-            "reczoo/MovieLens1M-rating",
+            "DukeNLPGroup/movielens-100k",
             split="train",
-            streaming=True,
-            trust_remote_code=True
+            streaming=True
         )
 
         user_buckets = defaultdict(list)
         for i, record in enumerate(dataset):
             if i >= stream_depth:
                 break
-            uid = str(record.get("userId", f"u_{i}"))
-            user_buckets[uid].append(record)
+            # Mapping fields from DukeNLPGroup/movielens-100k
+            uid = str(record.get("user_id", f"u_{i}"))
+            movie_id = str(record.get("movie_id", i))
+            rating = float(record.get("user_rating", 3.0))
+            
+            user_buckets[uid].append({
+                "movieId": movie_id,
+                "rating": rating,
+                "userId": uid
+            })
 
         qualified = [
             records for records in user_buckets.values()
