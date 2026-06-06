@@ -333,16 +333,15 @@ def _load_amazon_profiles_sync(
         hf_token = os.getenv("HUGGINGFACE_TOKEN") or os.getenv("HF_TOKEN")
 
         print(
-            f"[cloud_data] Streaming mteb/amazon_reviews_multi "
+            f"[cloud_data] Streaming HenrF/Amazon-Reviews-2023-bucket "
             f"(depth={stream_depth}, users={num_users})..."
         )
 
         ds = load_dataset(
-            "mteb/amazon_reviews_multi",
-            "en",
+            "json",
+            data_files={"train": "https://huggingface.co/buckets/HenrF/Amazon-Reviews-2023-bucket/raw/review_categories/Appliances.jsonl"},
             split="train",
-            streaming=True,
-            token=hf_token,
+            streaming=True
         )
 
         user_buckets: defaultdict = defaultdict(list)
@@ -355,13 +354,13 @@ def _load_amazon_profiles_sync(
             if category_filter and category_filter.lower() not in product_cat.lower():
                 continue
 
-            review_text = str(record.get("review_body", "")).strip()
+            review_text = str(record.get("text", "")).strip()
             if not review_text:
                 continue   # skip blank reviews — Soul Reader needs text
 
             reviewer_id = str(record.get("reviewer_id", f"anon_{i}"))
             product_id  = str(record.get("product_id",  f"prod_{i}"))
-            stars       = _safe_stars(record.get("stars", 3))
+            stars       = _safe_stars(record.get("rating", 3))
             title       = str(record.get("review_title", "")).strip() or f"Review of {product_id[:8]}"
             category    = _map_amazon_category(product_cat)
 
