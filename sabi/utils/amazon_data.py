@@ -323,3 +323,26 @@ def load_local_yelp_fallback() -> list:
     except Exception as e:
         print(f"[amazon] Local fallback failed: {e}")
         return []
+    
+def load_local_amazon_fallback():
+    """Returns a minimal list of local samples for evaluation."""
+    return [
+        {
+            "sample_id": "fallback_001",
+            "user_history": {
+                "user_id": "user_1",
+                "reviewed_items": [
+                    {"item_id": "nollywood_1432605", "rating_given": 4.0}
+                ]
+            },
+            "eval_item": {
+                "item_id": "nollywood_1172009",
+                "title": "The Black Book",
+                "avg_community_rating": 3.3
+            },
+            "ground_truth": {
+                "rating": 4.0,
+                "review_text": "This movie was great and very intense."
+            }
+        }
+    ]

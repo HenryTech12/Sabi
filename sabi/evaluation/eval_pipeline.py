@@ -27,8 +27,11 @@ from sabi.models.schemas import UserHistory, Item, EvaluationResults, EvalSample
 from sabi.utils.cloud_data import fetch_movielens_user_profiles, fetch_full_catalog
 from sabi.utils.amazon_data import fetch_amazon_eval_samples, load_local_amazon_fallback
 
-RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results.json")
+import os
+RESULTS_PATH = os.path.join(os.getcwd(), "results.json")
 
+from dotenv import load_dotenv
+load_dotenv()
 
 # ─────────────────────────────────────────
 # NDCG@10 helper
@@ -70,11 +73,19 @@ async def fetch_evaluation_samples(num_users: int = 25) -> list:
         return samples
 
     # Fallback 1: MovieLens + TMDB
+    # Fallback 1: MovieLens + TMDB
     print("[eval] Amazon unavailable. Falling back to MovieLens...")
+    
+    # --- CHANGE START ---
+    # You must await the gather function
+    
+    # Call directly as a coroutine, not via to_thread
     catalog, user_profiles = await asyncio.gather(
         fetch_full_catalog(limit=50),
-        asyncio.to_thread(fetch_movielens_user_profiles, num_users=num_users + 10)
+        fetch_movielens_user_profiles(num_users=num_users + 10)
     )
+    # --- CHANGE END ---
+    
     item_lookup = {item["item_id"]: item for item in catalog}
 
     samples = []
@@ -263,9 +274,13 @@ async def run_evaluation(num_users: int = 25):
         return {"error": "No samples were successfully evaluated."}
 
     rmse = float(np.sqrt(mean_squared_error(actual_ratings, predicted_ratings)))
+    # ... inside run_evaluation ...
+    
+    # Calculate these first
     avg_ndcg = float(np.mean(ndcg_scores)) if ndcg_scores else 0.0
-    avg_bert = float(np.mean(bert_scores)) if bert_scores else None
+    avg_bert = float(np.mean(bert_scores)) if bert_scores else 0.0 # Default to 0.0
 
+    # Instantiate the model with ALL data
     results = EvaluationResults(
         rmse=rmse,
         rouge_1=float(np.mean(rouge_scores["rouge1"])),
@@ -273,7 +288,10 @@ async def run_evaluation(num_users: int = 25):
         rouge_l=float(np.mean(rouge_scores["rougeL"])),
         sample_count=len(per_sample_results),
         per_sample_results=per_sample_results,
+        ndcg_10=round(avg_ndcg, 4),
+        bert_score=round(avg_bert, 4)
     )
+
 
     # Build full results dict with all metrics
     results_dict = results.model_dump()
@@ -302,3 +320,7 @@ def get_latest_results():
         with open(RESULTS_PATH) as f:
             return json.load(f)
     return None
+
+if __name__ == "__main__":
+    # This block runs when you execute the file from the command line
+    asyncio.run(run_evaluation(num_users=25))
