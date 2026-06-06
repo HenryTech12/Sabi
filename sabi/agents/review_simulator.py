@@ -5,7 +5,6 @@ from sabi.agents.soul_reader import build_soul_profile
 from sabi.agents.voice_mapper import get_voice_instruction, get_openai_client
 
 
-
 REVIEW_SIMULATOR_SYSTEM_PROMPT = """
 You are SABI's Review Simulator. You simulate authentic reviews that a 
 specific Nigerian human being would write — based on their psychological 
@@ -66,21 +65,113 @@ OUTPUT: Return ONLY valid JSON. No text outside JSON.
 }
 """
 
+
+def _parse_review_raw(raw: str) -> dict:
+    """
+    Safely strips markdown fences and parses JSON from an LLM response.
+    Handles nested responses where the result is wrapped in a parent key.
+    """
+    raw = raw.strip()
+
+    # Strip markdown code fences if present
+    if "```" in raw:
+        parts = raw.split("```")
+        # parts[1] is the content between first pair of fences
+        raw = parts[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    result = json.loads(raw)
+
+    # Handle nested responses e.g. {"simulation": {"predicted_rating": ...}}
+    if "predicted_rating" not in result:
+        for val in result.values():
+            if isinstance(val, dict) and "predicted_rating" in val:
+                result = val
+                break
+
+    return result
+
+
+def _coerce_review_response(result: dict) -> SimulateReviewResponse:
+    """
+    Applies safe defaults for any missing optional fields before
+    constructing the Pydantic model, preventing validation errors.
+    """
+    result.setdefault("predicted_rating", 3.0)
+    result.setdefault("review_text", "No review could be generated.")
+    result.setdefault("confidence_score", 0.5)
+    result.setdefault("rating_drivers", ["baseline"])
+    result.setdefault("dialect_used", "neutral_abuja")
+    result.setdefault("soul_profile_summary", "Nigerian user profile.")
+    result.setdefault("reasoning_chain", ["Prediction based on available data."])
+
+    # Clamp predicted_rating to valid range
+    try:
+        result["predicted_rating"] = round(
+            max(1.0, min(5.0, float(result["predicted_rating"]))), 1
+        )
+    except (TypeError, ValueError):
+        result["predicted_rating"] = 3.0
+
+    # Clamp confidence_score to valid range
+    try:
+        result["confidence_score"] = round(
+            max(0.0, min(1.0, float(result["confidence_score"]))), 2
+        )
+    except (TypeError, ValueError):
+        result["confidence_score"] = 0.5
+
+    # Ensure list fields are actually lists
+    for list_field in ("rating_drivers", "reasoning_chain"):
+        if not isinstance(result[list_field], list):
+            result[list_field] = [str(result[list_field])]
+
+    return SimulateReviewResponse(**result)
+
+
 async def simulate_review(
-    user_history: UserHistory, 
+    user_history: UserHistory,
     item: Item
 ) -> SimulateReviewResponse:
     """
-    Simulates a review and rating for a specific item based on user history.
+    Simulates an authentic Nigerian review and star rating for a given item,
+    based on the user's psychological soul profile and cultural identity.
+
+    Pipeline:
+        1. Soul Reader  → builds psychological + cultural profile
+        2. Voice Mapper → generates Nigerian dialect instruction
+        3. Review Sim   → produces predicted rating + review text
     """
-    # Step 1: Build soul profile
+    # ── Step 1: Build soul profile ───────────────────────────────────────────
     soul_profile = await build_soul_profile(user_history)
-    
-    # Step 2: Get Nigerian voice instruction
+
+    # ── Step 2: Get Nigerian voice instruction ───────────────────────────────
     voice_instruction = get_voice_instruction(soul_profile)
-    
-    # Step 3: Simulate the review
+
+    # ── Step 3: Simulate the review ──────────────────────────────────────────
     client = get_openai_client()
+
+    user_prompt = f"""
+SOUL PROFILE:
+{json.dumps(soul_profile.model_dump(), indent=2)}
+
+NIGERIAN VOICE INSTRUCTION:
+{voice_instruction}
+
+ITEM TO REVIEW:
+{json.dumps(item.model_dump(), indent=2)}
+
+USER'S PAST REVIEWS FOR CONTEXT:
+{json.dumps([r.model_dump() for r in user_history.reviewed_items[-5:]], indent=2)}
+
+Simulate exactly how this specific Nigerian person would rate and 
+review this item. Show your reasoning chain for the rating.
+Return ONLY valid JSON.
+"""
+
+    # ── First attempt ────────────────────────────────────────────────────────
     try:
         response = await client.chat.completions.create(
             model="gpt-4o",
@@ -88,63 +179,77 @@ async def simulate_review(
             max_tokens=1200,
             messages=[
                 {"role": "system", "content": REVIEW_SIMULATOR_SYSTEM_PROMPT},
-                {"role": "user", "content": f"""
-                SOUL PROFILE:
-                {json.dumps(soul_profile.model_dump(), indent=2)}
-                
-                NIGERIAN VOICE INSTRUCTION:
-                {voice_instruction}
-                
-                ITEM TO REVIEW:
-                {json.dumps(item.model_dump(), indent=2)}
-                
-                USER'S PAST REVIEWS FOR CONTEXT:
-                {json.dumps([r.model_dump() for r in user_history.reviewed_items[-5:]], indent=2)}
-                
-                Simulate exactly how this specific Nigerian person would rate and 
-                review this item. Show your reasoning chain for the rating.
-                Return ONLY valid JSON.
-                """}
+                {"role": "user", "content": user_prompt}
             ]
         )
-        
-        raw = response.choices[0].message.content.strip()
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        
-        result = json.loads(raw.strip())
-        
-        # Heuristic to handle nested responses in simulation
-        if "predicted_rating" not in result:
-            for val in result.values():
-                if isinstance(val, dict) and "predicted_rating" in val:
-                    result = val
-                    break
-                    
-        return SimulateReviewResponse(**result)
-    except Exception as e:
-        # Retry once
+        raw = response.choices[0].message.content
+        result = _parse_review_raw(raw)
+        return _coerce_review_response(result)
+
+    except Exception as first_error:
+        print(f"[review_simulator] First attempt failed: {first_error}. Retrying with full context...")
+
+    # ── Retry with full context (NOT just item.title) ────────────────────────
+    # BUG FIX: Original retry only sent item.title — that produces garbage.
+    # We resend the full soul profile, voice instruction, and item data.
+    try:
         response = await client.chat.completions.create(
             model="gpt-4o",
-            temperature=0.5,
+            temperature=0.3,   # Lower temperature on retry for more reliable JSON
             max_tokens=1200,
             messages=[
-                {"role": "system", "content": REVIEW_SIMULATOR_SYSTEM_PROMPT + "\nRETURN ONLY JSON. MATCH SCHEMA EXACTLY."},
-                {"role": "user", "content": f"Simulate review for item: {item.title}"}
+                {
+                    "role": "system",
+                    "content": REVIEW_SIMULATOR_SYSTEM_PROMPT
+                    + "\nCRITICAL: Return ONLY a valid JSON object. No markdown. No preamble. No explanation.",
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+SOUL PROFILE:
+{json.dumps(soul_profile.model_dump(), indent=2)}
+
+NIGERIAN VOICE INSTRUCTION:
+{voice_instruction}
+
+ITEM TO REVIEW:
+{json.dumps(item.model_dump(), indent=2)}
+
+USER'S PAST REVIEWS FOR CONTEXT:
+{json.dumps([r.model_dump() for r in user_history.reviewed_items[-5:]], indent=2)}
+
+Return ONLY valid JSON. No markdown fences. No extra text.
+"""
+                }
             ]
         )
-        raw = response.choices[0].message.content.strip()
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        result = json.loads(raw)
-        
-        if "predicted_rating" not in result:
-            for val in result.values():
-                if isinstance(val, dict) and "predicted_rating" in val:
-                    result = val
-                    break
-        return SimulateReviewResponse(**result)
+        raw = response.choices[0].message.content
+        result = _parse_review_raw(raw)
+        return _coerce_review_response(result)
+
+    except Exception as retry_error:
+        print(f"[review_simulator] Retry also failed: {retry_error}. Returning safe fallback response.")
+
+        # ── Safe fallback — never crash the API ─────────────────────────────
+        # Returns a graceful degraded response instead of a 500 error.
+        return SimulateReviewResponse(
+            predicted_rating=round(
+                max(1.0, min(5.0, item.avg_community_rating)), 1
+            ),
+            review_text=(
+                f"This {item.category} seems interesting based on what I know. "
+                f"I would give it a try."
+            ),
+            confidence_score=0.3,
+            rating_drivers=["community_baseline_fallback"],
+            dialect_used=soul_profile.dialect_persona if soul_profile else "neutral_abuja",
+            soul_profile_summary=(
+                soul_profile.rating_style + " Nigerian reviewer"
+                if soul_profile else "Nigerian reviewer"
+            ),
+            reasoning_chain=[
+                f"Both LLM attempts failed.",
+                f"Falling back to community average: {item.avg_community_rating}",
+                f"Error: {str(retry_error)[:100]}"
+            ]
+        )

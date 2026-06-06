@@ -13,14 +13,16 @@ load_dotenv()
 
 from sabi.agents.review_simulator import simulate_review
 from sabi.models.schemas import UserHistory, Item
+from sabi.utils.amazon_data import fetch_amazon_eval_samples, load_local_yelp_fallback
 
 def calculate_rmse(predictions: list, actuals: list) -> float:
-    if not predictions: return 0.0
+    if not predictions: 
+        return 0.0
     return float(np.sqrt(np.mean((np.array(predictions) - np.array(actuals)) ** 2)))
 
 def calculate_rouge(predicted_text: str, actual_text: str) -> dict:
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-    scores = scorer.score(actual_text, predicted_text)
+    scores = scorer.score(str(actual_text), str(predicted_text))
     return {
         "rouge1": round(scores['rouge1'].fmeasure, 4),
         "rouge2": round(scores['rouge2'].fmeasure, 4),
@@ -37,54 +39,96 @@ def calculate_ndcg_at_10(recommended_ids: list, ground_truth_ids: list) -> float
     return round(dcg / idcg, 4) if idcg > 0 else 0.0
 
 async def run_evaluation() -> dict:
-    # Use absolute paths or relative to workspace root
+    # Handle absolute environment paths or workspace fallback parameters
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    samples_path = os.path.join(base_dir, "data", "yelp_samples.json")
     results_path = os.path.join(base_dir, "evaluation", "results.json")
     
-    if not os.path.exists(samples_path):
-        return {"error": f"Samples not found at {samples_path}"}
+    if os.getenv("SABI_DATA_DIR"):
+        results_path = os.path.join(os.getenv("SABI_DATA_DIR"), "..", "evaluation", "results.json")
+        results_path = os.path.abspath(results_path)
 
-    with open(samples_path) as f:
-        samples = json.load(f)
+    print("[evaluator] Aggregating multi-domain validation evaluation samples...")
+    
+    # 1. Attempt high-fidelity live streaming via HuggingFace Amazon Reviews Multi
+    try:
+        samples = await fetch_amazon_eval_samples(num_users=25)
+    except Exception as e:
+        print(f"[evaluator] Live streaming connection bypassed: {e}. Slipping to fallbacks.")
+        samples = []
+
+    # 2. Fall back to absolute local data snapshots if streaming is offline or threshold is breached
+    if not samples:
+        print("[evaluator] Utilizing absolute local fallback data matrix.")
+        samples = load_local_yelp_fallback()
+
+    if not samples:
+        print("[evaluator] CRITICAL: No validation samples could be loaded.")
+        return {"error": "Evaluation matrices empty."}
 
     predicted_ratings, actual_ratings = [], []
     rouge_scores = []
     per_sample = []
 
-    print(f"Starting SABI evaluation on {len(samples)} samples...")
+    print(f"[evaluator] Commencing simulation sequence across {len(samples)} profiles...")
 
     for sample in samples:
+        sample_id = sample.get("sample_id", "unknown_sample")
         try:
-            user_history = UserHistory(**sample["user_history"])
-            item = Item(**sample["item"])
+            user_hist_raw = sample.get("user_history", {})
+            item_raw = sample.get("eval_item", sample.get("item", {}))
             
+            # Defensive field mapping normalization for strict Pydantic model alignment
+            # Ensures cross-domain and legacy datasets share identical internal signatures
+            reviewed_items = user_hist_raw.get("reviewed_items", [])
+            for item_entry in reviewed_items:
+                if "rating_given" not in item_entry and "rating" in item_entry:
+                    item_entry["rating_given"] = item_entry["rating"]
+            
+            if "avg_community_rating" not in item_raw and "rating" in item_raw:
+                item_raw["avg_community_rating"] = item_raw["rating"]
+            if "genre" not in item_raw:
+                item_raw["genre"] = [item_raw.get("category", "General")]
+
+            # Instantiate standard Pydantic validation boundaries
+            user_history = UserHistory(**user_hist_raw)
+            item = Item(**item_raw)
+            
+            # Map flexible target values safely across ground_truth dictionaries or flat files
+            ground_truth_block = sample.get("ground_truth", {})
+            actual_rating = ground_truth_block.get("rating", sample.get("actual_rating"))
+            actual_review_text = ground_truth_block.get("review_text", sample.get("actual_review_text", sample.get("actual_review")))
+            
+            if actual_rating is None or actual_review_text is None:
+                print(f"✗ Sample {sample_id} skipped: Missing ground truth target variables.")
+                continue
+
+            # Route execution to Agent 3 (Review Simulator)
             result = await simulate_review(user_history, item)
             
             predicted_ratings.append(result.predicted_rating)
-            actual_ratings.append(sample["actual_rating"])
+            actual_ratings.append(float(actual_rating))
             
-            rouge = calculate_rouge(result.review_text, sample["actual_review_text"])
+            rouge = calculate_rouge(result.review_text, actual_review_text)
             rouge_scores.append(rouge)
             
             per_sample.append({
-                "sample_id": sample["sample_id"],
-                "user_id": sample["user_id"],
-                "actual_rating": sample["actual_rating"],
+                "sample_id": sample_id,
+                "user_id": user_hist_raw.get("user_id", "unknown_user"),
+                "actual_rating": float(actual_rating),
                 "predicted_rating": result.predicted_rating,
-                "actual_review": sample["actual_review_text"],
+                "actual_review": str(actual_review_text),
                 "predicted_review": result.review_text,
                 "rouge": rouge,
-                "rmse_contribution": float((sample["actual_rating"] - result.predicted_rating) ** 2)
+                "rmse_contribution": float((float(actual_rating) - result.predicted_rating) ** 2)
             })
-            print(f"✓ {sample['sample_id']} processed")
+            print(f"✓ Sample {sample_id} safely quantified.")
             
         except Exception as e:
-            print(f"✗ Sample {sample['sample_id']} failed: {e}")
+            print(f"✗ Sample {sample_id} experienced runtime parsing exception: {e}")
             continue
 
     if not per_sample:
-        return {"error": "No samples were successfully evaluated"}
+        return {"error": "All execution nodes failed schema parsing constraints."}
 
     avg_rouge = {
         "rouge1": round(np.mean([s["rouge"]["rouge1"] for s in per_sample]), 4),
@@ -102,16 +146,16 @@ async def run_evaluation() -> dict:
         "per_sample_results": per_sample
     }
 
-    # Ensure evaluation directory exists
+    # Atomically write results file back to evaluation log directory
     os.makedirs(os.path.dirname(results_path), exist_ok=True)
-    with open(results_path, "w") as f:
+    with open(results_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
 
-    print("\n=== SABI EVALUATION RESULTS ===")
-    print(f"Samples evaluated: {results['sample_count']}")
-    print(f"Task A — RMSE: {results['rmse']:.4f}")
-    print(f"Task A — ROUGE-1: {avg_rouge['rouge1']} | ROUGE-2: {avg_rouge['rouge2']} | ROUGE-L: {avg_rouge['rougeL']}")
-    print(f"Results saved to {results_path}")
+    print("\n=== SABI SOUL ENGINE BENCHMARK METRICS ===")
+    print(f"Total Evaluated Run Cohort: {results['sample_count']}")
+    print(f"Task A Behavioral Consistency — RMSE: {results['rmse']:.4f}")
+    print(f"Task A Semantic Similarity    — ROUGE-1: {avg_rouge['rouge1']} | ROUGE-2: {avg_rouge['rouge2']} | ROUGE-L: {avg_rouge['rougeL']}")
+    print(f"[evaluator] Absolute metrics written cleanly to: {results_path}")
     
     return results
 

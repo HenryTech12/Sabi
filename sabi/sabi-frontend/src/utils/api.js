@@ -18,7 +18,7 @@ const getBaseUrl = () => {
 const api = axios.create({
     baseURL: getBaseUrl(),
     headers: { "Content-Type": "application/json" },
-    timeout: 60000, // 60 seconds — LLM calls take time
+    timeout: 120000, // 120 seconds — LLM calls take time
 });
 
 export const simulateReview = async (userHistory, item) => {

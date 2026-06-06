@@ -45,19 +45,18 @@ app_data = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load items.json and nigerian_priors.json at startup
     try:
-        # Use base_dir calculated above
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # ADD THIS LINE
         with open(os.path.join(base_dir, "data", "items.json")) as f:
             app_data["items"] = json.load(f)
         with open(os.path.join(base_dir, "data", "nigerian_priors.json")) as f:
             app_data["priors"] = json.load(f)
         with open(os.path.join(base_dir, "data", "sample_users.json")) as f:
             app_data["personas"] = json.load(f)
+        print(f"[startup] Loaded {len(app_data['items'])} items, {len(app_data['personas'])} personas")
     except Exception as e:
         print(f"Error loading startup data: {e}")
     yield
-    # Clean up on shutdown if needed
     app_data.clear()
 
 app = FastAPI(
@@ -149,14 +148,6 @@ def get_items():
         with open(os.path.join(base_dir, "data", "items.json")) as f:
             return json.load(f)
     return app_data["items"]
-
-@app.get("/health")
-def health():
-    return {
-        "status": "alive", 
-        "agent": "SABI",
-        "data_loaded": "items" in app_data and "priors" in app_data
-    }
 
 # Evaluation Endpoints
 @app.get("/evaluation/results", response_model=EvaluationResponse)

@@ -9,3 +9,5 @@ rouge-score
 scikit-learn
 numpy
 pandas
+bert-score
+torch
