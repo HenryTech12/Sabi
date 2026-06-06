@@ -150,10 +150,7 @@ def _normalize_region_key(region: str) -> str:
 
 
 def _parse_raw_json(raw: str) -> dict:
-    """
-    Strips markdown fences and parses JSON from an LLM response.
-    Handles the common ```json ... ``` wrapping.
-    """
+    """Strips markdown fences and parses JSON, with auto-repair for truncation."""
     raw = raw.strip()
     if "```" in raw:
         parts = raw.split("```")
@@ -161,7 +158,16 @@ def _parse_raw_json(raw: str) -> dict:
         if raw.startswith("json"):
             raw = raw[4:]
         raw = raw.strip()
-    return json.loads(raw)
+    
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # NEW FIX: Auto-repair truncated JSON
+        for i in range(5):
+            try:
+                return json.loads(raw + ("}" * i) + ("]" * i))
+            except: continue
+    raise ValueError("JSON parsing failed after repair attempts.")
 
 
 def _parse_recommendation_response(
@@ -451,21 +457,19 @@ Recommend {n_recommendations} items. Return ONLY valid JSON.
     # That produces completely wrong recommendations because the LLM has no
     # soul profile, no items list, and no Nigerian context.
     # We now resend the complete prompt at lower temperature for reliability.
+    # ── Retry with full context ───────────────────────────────────────────────
+    retry_error = None # Initialize this here!
     try:
         response = await client.chat.completions.create(
             model="gpt-4o",
-            temperature=0.1,   # lower temperature on retry = more reliable JSON
+            temperature=0.1,
             max_tokens=3000,
             messages=[
                 {
                     "role": "system",
-                    "content": RECOMMENDER_SYSTEM_PROMPT
-                    + "\nCRITICAL: OUTPUT MUST BE ONLY VALID JSON. NO MARKDOWN. NO PREAMBLE.",
+                    "content": RECOMMENDER_SYSTEM_PROMPT + "\nCRITICAL: OUTPUT MUST BE ONLY VALID JSON. NO MARKDOWN. NO PREAMBLE.",
                 },
-                {
-                    "role": "user",
-                    "content": user_prompt   # same full prompt as first attempt
-                }
+                {"role": "user", "content": user_prompt}
             ]
         )
         return _parse_recommendation_response(
@@ -473,15 +477,16 @@ Recommend {n_recommendations} items. Return ONLY valid JSON.
             soul_profile, items_by_id, cold_start, context
         )
 
-    except Exception as retry_error:
+    except Exception as e: # Catch as 'e'
+        retry_error = e # Assign it to the variable
         print(f"[recommender] Retry also failed: {retry_error}. Returning community-ranked fallback.")
 
     # ── Safe fallback — never crash the API ───────────────────────────────────
-    # Returns top-rated available items so the UI always gets something useful.
+    # Now retry_error is safely defined
     return _build_fallback_response(
         soul_profile,
         available_items,
         cold_start,
         context,
-        error_msg=str(retry_error)
+        error_msg=str(retry_error) if retry_error else "Unknown error during retry"
     )

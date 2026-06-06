@@ -1,6 +1,6 @@
 from pydantic import BaseModel, model_validator
 from typing import Optional, List
-
+import re
 class ReviewedItem(BaseModel):
     item_id: str
     title: str = "Unknown"
@@ -62,6 +62,10 @@ class SimulateReviewRequest(BaseModel):
     user_history: UserHistory
     item: Item
 
+import re
+from pydantic import BaseModel, model_validator
+from typing import List
+
 class SimulateReviewResponse(BaseModel):
     predicted_rating: float
     review_text: str
@@ -70,6 +74,61 @@ class SimulateReviewResponse(BaseModel):
     dialect_used: str
     soul_profile_summary: str
     reasoning_chain: List[str]
+
+    @model_validator(mode="after")
+    def force_mathematical_consistency(self) -> "SimulateReviewResponse":
+        """
+        Intelligently parses the reasoning chain steps. If the LLM explicitly 
+        declares a 'Final predicted rating' line, it prioritizes that anchor 
+        to ensure perfect matching between text and output floats.
+        """
+        calculated_rating = 0.0
+        chain = self.reasoning_chain
+
+        if not chain:
+            return self
+
+        # Check if the LLM explicitly stated its final intended score in the text chain
+        explicit_final_score = None
+        for step in chain:
+            step_lower = step.lower()
+            if "final predicted rating" in step_lower or "final rating" in step_lower:
+                final_numbers = re.findall(r"\d*\.\d+|\d+", step)
+                if final_numbers:
+                    explicit_final_score = float(final_numbers[0])
+                    break
+
+        if explicit_final_score is not None:
+            # 👈 Trust the LLM's explicit textual conclusion so the float matches perfectly!
+            final_clamped = round(max(1.0, min(5.0, explicit_final_score)), 1)
+        else:
+            # Fallback to cumulative calculation step-by-step
+            for step in chain:
+                step_lower = step.lower()
+                numbers = re.findall(r"[-+]?\d*\.\d+|\d+", step)
+                if not numbers:
+                    continue
+                
+                val = float(numbers[0])
+
+                if "started at" in step_lower or "baseline" in step_lower or "adjusted" in step_lower:
+                    calculated_rating = val
+                elif "+" in step or "bonus" in step_lower or "increment" in step_lower:
+                    calculated_rating += abs(val)
+                elif "-" in step or "penalty" in step_lower or "decrement" in step_lower:
+                    calculated_rating -= abs(val)
+                else:
+                    if calculated_rating == 0.0:
+                        calculated_rating = val
+            
+            final_clamped = round(max(1.0, min(5.0, calculated_rating)), 1)
+        
+        # Override the payload float to match the textual trace perfectly
+        if self.predicted_rating != final_clamped:
+            print(f"[sabi_validator] Synced predicted_rating float with chain anchor: {final_clamped}")
+            self.predicted_rating = final_clamped
+
+        return self
 
 class ChatMessage(BaseModel):
     role: str
@@ -94,7 +153,7 @@ class RecommendationItem(BaseModel):
 class RecommendResponse(BaseModel):
     recommendations: List[RecommendationItem]
     soul_profile_summary: str
-    dialect_used: str
+    dialect_used: str = "neutral_abuja"
     cold_start_applied: bool
     context_applied: str
 

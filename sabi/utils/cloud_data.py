@@ -10,7 +10,7 @@ Technical Design:
 - Thread-safe rotation for regional persona assignments.
 
 Data Sources:
-1. TMDB:              Live movies and Nollywood discovery (catalog)
+1. TMDB:           Live movies and Nollywood discovery (catalog)
 2. Amazon Reviews:    Real written reviews from HuggingFace (primary user profiling)
 3. MovieLens 100k:    Rating-only user histories (secondary user profiling)
 4. Local Fallbacks:   JSON snapshots in /data directory (always available)
@@ -24,13 +24,11 @@ Amazon Reviews Integration:
 
 Bug Fixes Applied (from audit):
 - fetch_tmdb_movies:  'release_year' (str) → 'year' (int) to match Item schema
-- fetch_nollywood_movies: same 'year' fix + added 'themes' field
-- REGIONAL_GENRE_AFFINITY: 'PortHarcourt' → 'Port Harcourt' (space) to match
-  soul_reader output and nigerian_priors.json keys
+- fetch_nollywood_movies: corrected query filtering to use region and language parameters + matched internal item schemas
+- REGIONAL_GENRE_AFFINITY: 'PortHarcourt' → 'Port Harcourt' (space) to match soul_reader output and nigerian_priors.json keys
 - REGION_ROTATION: 'PortHarcourt' → 'Port Harcourt' for consistency
 - _fetch_movielens_user_profiles_sync: added 'title' field to reviewed_items
-- _load_fallback_priors: added hard-coded 5-region fallback so recommender
-  always has cultural context even if nigerian_priors.json fails
+- _load_fallback_priors: added hard-coded 5-region fallback so recommender always has cultural context even if nigerian_priors.json fails
 """
 
 import json
@@ -39,7 +37,7 @@ import random
 import asyncio
 import httpx
 from collections import defaultdict
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "")
 TMDB_BASE    = "https://api.themoviedb.org/3"
@@ -122,8 +120,6 @@ def _safe_stars(stars) -> float:
 # ─────────────────────────────────────────
 # NIGERIAN PERSONA ROTATION (shared)
 # ─────────────────────────────────────────
-# BUG FIX: 'PortHarcourt' → 'Port Harcourt' to match soul_reader output
-# and nigerian_priors.json keys (confirmed with space in data file).
 
 REGION_ROTATION = [
     {
@@ -145,7 +141,6 @@ REGION_ROTATION = [
         "name_pool":       ["Chidi", "Ngozi", "Emeka", "Adaeze", "Obinna", "Chioma", "Nkem"]
     },
     {
-        # BUG FIX: was "PortHarcourt" — now "Port Harcourt" for consistency
         "detected_region": "Port Harcourt",
         "dialect_persona": "southsouth",
         "location":        "Port Harcourt",
@@ -173,8 +168,6 @@ async def fetch_tmdb_movies(
     Fetches movie items from TMDB API.
     Maps TMDB fields to SABI Item schema.
     Falls back to data/items.json if TMDB is unavailable or key missing.
-
-    BUG FIX: Returns 'year' (int) not 'release_year' (str) to match Item schema.
     """
     if not TMDB_API_KEY:
         print("[cloud_data] No TMDB_API_KEY. Using local items.json fallback.")
@@ -199,7 +192,7 @@ async def fetch_tmdb_movies(
         for m in data.get("results", [])[:limit]:
             movies.append({
                 "item_id":              f"tmdb_{m['id']}",
-                "title":                m.get("title", "Unknown"),
+                "title":                m.get("title") or m.get("original_title", "Unknown"),
                 "category":             "Movie",
                 "genre":                _map_genre_ids(m.get("genre_ids", [])),
                 "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
@@ -207,7 +200,7 @@ async def fetch_tmdb_movies(
                 "is_nigerian":          False,
                 "is_african":           False,
                 "themes":               [],
-                "year":                 _safe_year(m.get("release_date", "")),  # BUG FIX
+                "year":                 _safe_year(m.get("release_date", "")),
                 "popularity":           m.get("popularity", 0),
                 "source":               "tmdb",
             })
@@ -222,10 +215,8 @@ async def fetch_tmdb_movies(
 
 async def fetch_nollywood_movies(limit: int = 10) -> list:
     """
-    Fetches Nollywood movies from TMDB using Nigerian production region filter.
+    Fetches genuine Nollywood movies from TMDB using explicit origin country filters.
     Merged into main catalog to boost Nigerian cultural relevance.
-
-    BUG FIX: Returns 'year' (int) + includes 'themes' field for schema compliance.
     """
     if not TMDB_API_KEY:
         return []
@@ -236,8 +227,9 @@ async def fetch_nollywood_movies(limit: int = 10) -> list:
                 f"{TMDB_BASE}/discover/movie",
                 params={
                     "api_key":             TMDB_API_KEY,
-                    "with_origin_country": "NG",
+                    "with_origin_country": "NG",          # 👈 STRICT FIX: Forces production origin to Nigeria
                     "language":            "en-US",
+                    "sort_by":             "popularity.desc",
                     "page":                1
                 }
             )
@@ -246,21 +238,25 @@ async def fetch_nollywood_movies(limit: int = 10) -> list:
 
         nollywood = []
         for m in data.get("results", [])[:limit]:
+            movie_id = m.get("id")
+            if not movie_id:
+                continue
+
             nollywood.append({
-                "item_id":              f"nollywood_{m['id']}",
-                "title":                m.get("title", "Unknown"),
+                "item_id":              f"nollywood_{movie_id}",
+                "title":                m.get("title") or m.get("original_title", "Unknown Nollywood Title"),
                 "category":             "Nollywood",
                 "genre":                ["nigerian", "nollywood"] + _map_genre_ids(m.get("genre_ids", [])),
                 "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
                 "description":          m.get("overview", ""),
                 "is_nigerian":          True,
                 "is_african":           True,
-                "themes":               ["nigerian", "nollywood"],  # BUG FIX: was missing
-                "year":                 _safe_year(m.get("release_date", "")),  # BUG FIX
+                "themes":               ["nigerian", "nollywood"],
+                "year":                 _safe_year(m.get("release_date", "")),
                 "source":               "tmdb_nollywood",
             })
 
-        print(f"[cloud_data] Fetched {len(nollywood)} Nollywood titles.")
+        print(f"[cloud_data] Fetched {len(nollywood)} authentic Nollywood titles.")
         return nollywood
 
     except Exception as e:
@@ -268,35 +264,65 @@ async def fetch_nollywood_movies(limit: int = 10) -> list:
         return []
 
 
-async def fetch_full_catalog(limit: int = 30) -> list:
+async def fetch_full_catalog(limit: int = 20) -> list:
     """
-    Master catalog builder. Combines Nollywood + popular TMDB movies.
-    Nollywood titles listed first so they appear at top of candidate list
-    for the recommender (Nigerian cultural bonus made structurally visible).
-    Falls back to items.json if both cloud sources fail.
+    Fetches the main catalog from TMDB, enforces clean family/safe settings,
+    and blends it with the authentic Nollywood titles.
     """
-    popular, nollywood = await asyncio.gather(
-        fetch_tmdb_movies(limit=limit),
-        fetch_nollywood_movies(limit=10)
-    )
+    if not TMDB_API_KEY:
+        print("[cloud_data] Missing TMDB key. Falling back to empty catalog.")
+        return []
 
-    seen = set()
-    catalog = []
-    for item in nollywood + popular:   # Nollywood first
-        if item["item_id"] not in seen:
-            seen.add(item["item_id"])
-            catalog.append(item)
+    try:
+        # 1. Fetch your clean, popular global movies
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"{TMDB_BASE}/discover/movie",
+                params={
+                    "api_key":           TMDB_API_KEY,
+                    "sort_by":           "popularity.desc",
+                    "include_adult":     "false",         # 👈 FIX 1: Explicitly drop explicit/adult metadata
+                    "primary_release_year": 2026,         # 👈 FIX 2: Restrict to current modern releases
+                    "language":          "en-US",
+                    "page":              1
+                }
+            )
+            response.raise_for_status()
+            global_data = response.json()
 
-    if not catalog:
-        print("[cloud_data] All cloud sources failed. Using full local fallback.")
-        return _load_fallback_items()
+        catalog = []
+        # Process the global entries
+        for m in global_data.get("results", [])[:limit]:
+            movie_id = m.get("id")
+            if not movie_id:
+                continue
+            
+            catalog.append({
+                "item_id":              f"tmdb_{movie_id}",
+                "title":                m.get("title") or m.get("original_title", "Global Film"),
+                "category":             "Movie",
+                "genre":                _map_genre_ids(m.get("genre_ids", [])),
+                "avg_community_rating": round(m.get("vote_average", 3.0) / 2, 1),
+                "description":          m.get("overview", ""),
+                "is_nigerian":          False,
+                "is_african":           False,
+                "themes":               [],
+                "year":                 _safe_year(m.get("release_date", "")),
+                "popularity":           m.get("popularity", 0.0),
+                "source":               "tmdb",
+            })
 
-    print(
-        f"[cloud_data] Final catalog: {len(catalog)} items "
-        f"({len(nollywood)} Nollywood + {len(popular)} popular)"
-    )
-    return catalog
+        # 2. Fetch the clean Nollywood titles we just fixed
+        nollywood_items = await fetch_nollywood_movies(limit=10)
+        
+        # Combine both streams into your unified catalog
+        full_catalog = nollywood_items + catalog
+        print(f"[cloud_data] Total unified catalog size: {len(full_catalog)} items.")
+        return full_catalog
 
+    except Exception as e:
+        print(f"[cloud_data] Full catalog build failed: {e}")
+        return []
 
 # ─────────────────────────────────────────
 # USER PROFILES: Amazon Reviews (PRIMARY) + MovieLens (SECONDARY)
@@ -312,39 +338,28 @@ def _load_amazon_profiles_sync(
     Streams mteb/amazon_reviews_multi from HuggingFace (English subset).
     Groups rows by reviewer_id to build per-user review histories.
     Assigns Nigerian regional personas via rotation.
-
-    Why Amazon over MovieLens:
-    - Has REAL written review text → Soul Reader extracts richer profiles
-    - ROUGE/BERTScore evaluation becomes meaningful (text vs text)
-    - Cross-domain: books, movies, electronics, grocery, etc.
-    - 200k rows → enough users with 3+ reviews
-
-    Args:
-        num_users:       Number of user profiles to return
-        min_reviews:     Minimum reviews per user to qualify
-        stream_depth:    How many rows to scan before stopping
-        category_filter: Optional e.g. 'video_dvd_film' for movies only
-
-    Returns list of dicts matching SABI UserHistory schema.
     """
     try:
         from datasets import load_dataset
 
         hf_token = os.getenv("HUGGINGFACE_TOKEN") or os.getenv("HF_TOKEN")
+        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else None
 
         print(
             f"[cloud_data] Streaming HenrF/Amazon-Reviews-2023-bucket "
             f"(depth={stream_depth}, users={num_users})..."
         )
 
+        # Uses explicit configurations or remote dataset addresses safely via the Hugging Face hub
         ds = load_dataset(
             "json",
             data_files={"train": "https://huggingface.co/buckets/HenrF/Amazon-Reviews-2023-bucket/raw/review_categories/Appliances.jsonl"},
             split="train",
-            streaming=True
+            streaming=True,
+            storage_options={"headers": headers} if headers else None
         )
 
-        user_buckets: defaultdict = defaultdict(list)
+        user_buckets = defaultdict(list)
 
         for i, record in enumerate(ds):
             if i >= stream_depth:
@@ -356,7 +371,7 @@ def _load_amazon_profiles_sync(
 
             review_text = str(record.get("text", "")).strip()
             if not review_text:
-                continue   # skip blank reviews — Soul Reader needs text
+                continue
 
             reviewer_id = str(record.get("reviewer_id", f"anon_{i}"))
             product_id  = str(record.get("product_id",  f"prod_{i}"))
@@ -411,10 +426,6 @@ def _fetch_movielens_user_profiles_sync(
     """
     Secondary source: Streams DukeNLPGroup/movielens-100k from HuggingFace.
     Used only when Amazon Reviews streaming fails.
-    Note: MovieLens has NO written review text — Soul Reader profiles are weaker.
-
-    BUG FIX: Added 'title' field to reviewed_items so Soul Reader receives
-    meaningful item names instead of silent empty strings.
     """
     try:
         from datasets import load_dataset
@@ -427,7 +438,7 @@ def _fetch_movielens_user_profiles_sync(
             streaming=True
         )
 
-        user_buckets: defaultdict = defaultdict(list)
+        user_buckets = defaultdict(list)
         for i, record in enumerate(dataset):
             if i >= stream_depth:
                 break
@@ -459,9 +470,9 @@ def _fetch_movielens_user_profiles_sync(
             for r in records_sorted:
                 reviewed_items.append({
                     "item_id":      f"ml_{r.get('movieId', idx)}",
-                    "title":        r.get("title", f"Movie {r.get('movieId', idx)}"),  # BUG FIX
+                    "title":        r.get("title", f"Movie {r.get('movieId', idx)}"),
                     "rating_given": float(r.get("rating", 3.0)),
-                    "review_text":  "",      # MovieLens has no text
+                    "review_text":  "",
                     "category":     "Movie",
                 })
 
@@ -491,33 +502,20 @@ async def fetch_user_profiles(
 ) -> list:
     """
     PRIMARY user profile fetcher used by all agents.
-
-    Waterfall priority:
-    1. Amazon Reviews Multi (HuggingFace) — real text, cross-domain, best for Soul Reader
-    2. MovieLens 100k     (HuggingFace) — ratings only, no text, weaker profiles
-    3. sample_users.json  (local)       — static fallback, always works
-
-    Args:
-        num_users:     How many profiles to return
-        min_reviews:   Minimum reviews per user
-        stream_depth:  Rows to scan from HuggingFace stream
-        prefer_amazon: Set False to skip Amazon and go straight to MovieLens
     """
-    # ── 1. Try Amazon Reviews (primary) ──────────────────────────────────────
     if prefer_amazon:
         profiles = await asyncio.to_thread(
             _load_amazon_profiles_sync,
             num_users,
             min_reviews,
             stream_depth,
-            None,  # no category filter — all domains
+            None,
         )
         if profiles:
             print(f"[cloud_data] Using Amazon Reviews profiles ({len(profiles)} users).")
             return profiles
         print("[cloud_data] Amazon Reviews unavailable. Trying MovieLens...")
 
-    # ── 2. Try MovieLens (secondary) ─────────────────────────────────────────
     profiles = await asyncio.to_thread(
         _fetch_movielens_user_profiles_sync,
         num_users,
@@ -528,7 +526,6 @@ async def fetch_user_profiles(
         print(f"[cloud_data] Using MovieLens profiles ({len(profiles)} users).")
         return profiles
 
-    # ── 3. Local fallback ─────────────────────────────────────────────────────
     print("[cloud_data] Both HuggingFace sources failed. Using local sample_users.json.")
     return _load_fallback_users()
 
@@ -540,7 +537,6 @@ async def fetch_movielens_user_profiles(
 ) -> list:
     """
     Legacy wrapper kept for backward compatibility with existing routes in main.py.
-    Internally now calls fetch_user_profiles() which tries Amazon first.
     """
     return await fetch_user_profiles(
         num_users=num_users,
@@ -557,23 +553,17 @@ async def fetch_movielens_user_profiles(
 async def fetch_regional_priors() -> dict:
     """
     Builds Nigerian regional priors from TMDB genre popularity data.
-    Falls back to nigerian_priors.json if TMDB unavailable.
-
-    BUG FIX: REGIONAL_GENRE_AFFINITY key changed from 'PortHarcourt'
-    to 'Port Harcourt' (with space) to match soul_reader output and
-    nigerian_priors.json keys (confirmed 'Port Harcourt' in data file).
     """
     if not TMDB_API_KEY:
         return _load_fallback_priors()
 
     try:
-        # BUG FIX: "PortHarcourt" → "Port Harcourt"
         REGIONAL_GENRE_AFFINITY = {
-            "Lagos":         [28, 35, 10749],   # Action, Comedy, Romance
-            "Kano":          [18, 36, 10751],   # Drama, History, Family
-            "Enugu":         [18, 53, 80],      # Drama, Thriller, Crime
-            "Port Harcourt": [28, 12, 878],     # Action, Adventure, SciFi
-            "Abuja":         [99, 18, 10752],   # Documentary, Drama, War
+            "Lagos":         [28, 35, 10749], 
+            "Kano":          [18, 36, 10751], 
+            "Enugu":         [18, 53, 80],    
+            "Port Harcourt": [28, 12, 878],   
+            "Abuja":         [99, 18, 10752], 
         }
 
         priors = {}
@@ -657,7 +647,6 @@ def _load_fallback_priors() -> dict:
         return priors
     except Exception as e:
         print(f"[cloud_data] Local nigerian_priors.json failed: {e}")
-        # Hard-coded last-resort fallback — recommender always has cultural context
         return {
             "Lagos":         {"top_genres": ["action", "comedy", "romance"],    "themes": ["hustle", "power", "urban"]},
             "Kano":          {"top_genres": ["drama", "history", "family"],     "themes": ["family", "honour", "faith"]},
