@@ -38,6 +38,8 @@ const ConversationalRecommender = ({ userHistory }) => {
                 currentMessage
             );
 
+            console.log("Full API Response:", data); // Add this line
+
             const assistantMessage = {
                 role: "assistant",
                 content: data.soul_profile_summary || data.reasoning || "Here are some matches for you:",
