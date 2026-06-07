@@ -28,7 +28,8 @@ from sabi.agents.recommender import get_recommendations
 from sabi.utils.evaluator import run_evaluation
 from sabi.agents.cold_start_demo import run_cold_start_demo
 from sabi.agents.pipeline_demo import run_full_pipeline_demo
-from sabi.utils.cloud_data import fetch_full_catalog, fetch_movielens_user_profiles
+from sabi.utils.cloud_data import fetch_full_catalog, fetch_user_profiles
+
 
 # Get the directory of the project root (one level up from sabi/)
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -212,11 +213,9 @@ async def get_nollywood():
 
 @app.get("/users/sample")
 async def get_sample_users(n: int = 5):
-    """Returns sample user profiles from MovieLens with Nigerian personas"""
-    import asyncio
-    profiles = await asyncio.to_thread(
-        fetch_movielens_user_profiles, num_users=n
-    )
+    """Returns sample user profiles (Tiered: Amazon -> MovieLens -> Local)"""
+    # FIXED: await pauses execution until the data is fetched
+    profiles = await fetch_user_profiles(num_users=n)
     return {"count": len(profiles), "users": profiles}
 
 @app.get("/health")

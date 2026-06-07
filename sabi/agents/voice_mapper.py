@@ -12,7 +12,7 @@ def get_openai_client():
         # and reuse it via a singleton to prevent 'aclose' attribute errors during GC.
         http_client = httpx.AsyncClient()
         _client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            http_client=http_client
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url="https://api.groq.com/openai/v1",
         )
     return _client

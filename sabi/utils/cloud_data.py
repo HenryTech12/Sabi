@@ -342,22 +342,13 @@ def _load_amazon_profiles_sync(
     try:
         from datasets import load_dataset
 
-        hf_token = os.getenv("HUGGINGFACE_TOKEN") or os.getenv("HF_TOKEN")
-        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else None
+        # Use your existing path utility
+        local_path = _get_absolute_data_path("amazon_reviews_processed.jsonl")
 
-        print(
-            f"[cloud_data] Streaming HenrF/Amazon-Reviews-2023-bucket "
-            f"(depth={stream_depth}, users={num_users})..."
-        )
+        print(f"[cloud_data] Loading local Amazon data from {local_path}...")
 
-        # Uses explicit configurations or remote dataset addresses safely via the Hugging Face hub
-        ds = load_dataset(
-            "json",
-            data_files={"train": "https://huggingface.co/buckets/HenrF/Amazon-Reviews-2023-bucket/raw/review_categories/Appliances.jsonl"},
-            split="train",
-            streaming=True,
-            storage_options={"headers": headers} if headers else None
-        )
+        # Load from the local path directly
+        ds = load_dataset("json", data_files=local_path, split="train", streaming=True)
 
         user_buckets = defaultdict(list)
 
@@ -496,38 +487,38 @@ def _fetch_movielens_user_profiles_sync(
 
 async def fetch_user_profiles(
     num_users: int = 10,
-    min_reviews: int = 3,
+    min_reviews: int = 1,
     stream_depth: int = 10000,
-    prefer_amazon: bool = True,
 ) -> list:
     """
-    PRIMARY user profile fetcher used by all agents.
+    PRIMARY user profile fetcher.
+    Tier 1: Amazon Reviews (Rich Text)
+    Tier 2: MovieLens (Rating Only)
+    Tier 3: Local Fallback (Static)
     """
-    if prefer_amazon:
-        profiles = await asyncio.to_thread(
-            _load_amazon_profiles_sync,
-            num_users,
-            min_reviews,
-            stream_depth,
-            None,
-        )
-        if profiles:
-            print(f"[cloud_data] Using Amazon Reviews profiles ({len(profiles)} users).")
-            return profiles
-        print("[cloud_data] Amazon Reviews unavailable. Trying MovieLens...")
-
-    profiles = await asyncio.to_thread(
-        _fetch_movielens_user_profiles_sync,
-        num_users,
-        min_reviews,
-        3000,
+    
+    # 1. TIER 1: Amazon (Rich text data)
+    print(f"[cloud_data] Tier 1: Attempting to fetch from Amazon ({num_users} users)...")
+    amazon_profiles = await asyncio.to_thread(
+        _load_amazon_profiles_sync, num_users, min_reviews, stream_depth, None
     )
-    if profiles:
-        print(f"[cloud_data] Using MovieLens profiles ({len(profiles)} users).")
-        return profiles
+    if amazon_profiles:
+        print(f"[cloud_data] Success: Loaded {len(amazon_profiles)} profiles from Amazon.")
+        return amazon_profiles
 
-    print("[cloud_data] Both HuggingFace sources failed. Using local sample_users.json.")
-    return _load_fallback_users()
+    # 2. TIER 2: MovieLens (Rating only data)
+    print("[cloud_data] Amazon unavailable. Tier 2: Attempting to fetch from MovieLens...")
+    ml_profiles = await asyncio.to_thread(
+        _fetch_movielens_user_profiles_sync, num_users, min_reviews, 3000
+    )
+    if ml_profiles:
+        print(f"[cloud_data] Success: Loaded {len(ml_profiles)} profiles from MovieLens.")
+        return ml_profiles
+
+    # 3. TIER 3: Local Fallback (Guaranteed)
+    print("[cloud_data] All remote sources failed. Tier 3: Loading local fallback.")
+    local_profiles = _load_fallback_users()
+    return local_profiles
 
 
 async def fetch_movielens_user_profiles(
@@ -654,3 +645,4 @@ def _load_fallback_priors() -> dict:
             "Port Harcourt": {"top_genres": ["action", "adventure", "sci-fi"],  "themes": ["community", "brotherhood", "resilience"]},
             "Abuja":         {"top_genres": ["documentary", "drama", "war"],    "themes": ["power", "politics", "prestige"]},
         }
+        

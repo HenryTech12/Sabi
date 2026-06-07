@@ -1,6 +1,25 @@
+"""
+SABI Pydantic Schemas.
+
+Bug Fix Applied:
+- Removed force_mathematical_consistency validator from SimulateReviewResponse.
+  This validator was recalculating predicted_rating by parsing the reasoning_chain
+  text. When LLM calls failed (rate limit / fallback), the chain contained error
+  messages with no 'baseline'/'started at' keywords, so calculated_rating stayed
+  at 0.0 and was clamped to max(1.0, 0.0) = 1.0.
+  Result: every sample got predicted_rating=1.0 regardless of actual prediction,
+  causing RMSE=2.93 and making all evaluation results meaningless.
+  Fix: trust the predicted_rating the LLM returns directly. The review_simulator
+  already clamps it to 1.0-5.0 before building this object.
+"""
+
 from pydantic import BaseModel, model_validator
 from typing import Optional, List
 import re
+
+
+# ── Core item/user schemas ────────────────────────────────────────────────────
+
 class ReviewedItem(BaseModel):
     item_id: str
     title: str = "Unknown"
@@ -18,6 +37,7 @@ class ReviewedItem(BaseModel):
                 data = {**data, "rating_given": data["rating"]}
         return data
 
+
 class UserHistory(BaseModel):
     user_id: str
     name: str = "Unknown"
@@ -25,6 +45,7 @@ class UserHistory(BaseModel):
     location: str = "Lagos"
     occupation: Optional[str] = None
     reviewed_items: List[ReviewedItem]
+
 
 class SoulProfile(BaseModel):
     user_id: str
@@ -45,6 +66,7 @@ class SoulProfile(BaseModel):
     dialect_persona: str
     cultural_affinity_score: float
 
+
 class Item(BaseModel):
     item_id: str
     title: str
@@ -58,13 +80,13 @@ class Item(BaseModel):
     year: Optional[int] = 2024
     poster_path: Optional[str] = None   # TMDB poster URL
 
+
+# ── Request/Response schemas ──────────────────────────────────────────────────
+
 class SimulateReviewRequest(BaseModel):
     user_history: UserHistory
     item: Item
 
-import re
-from pydantic import BaseModel, model_validator
-from typing import List
 
 class SimulateReviewResponse(BaseModel):
     predicted_rating: float
@@ -75,64 +97,45 @@ class SimulateReviewResponse(BaseModel):
     soul_profile_summary: str
     reasoning_chain: List[str]
 
+    # BUG FIX: Removed force_mathematical_consistency validator.
+    #
+    # The old validator re-parsed the reasoning_chain text to recalculate
+    # predicted_rating. This worked when the LLM succeeded but broke catastrophically
+    # when it failed (rate limit / fallback path):
+    #
+    #   reasoning_chain = [
+    #       "Both LLM attempts failed.",
+    #       "Falling back to community average: 3.3",
+    #       "Error: 429 rate_limit_exceeded..."
+    #   ]
+    #
+    # The cumulative parser found no "baseline"/"started at" keyword so
+    # calculated_rating stayed 0.0 → clamped to max(1.0, 0.0) = 1.0.
+    # Every single sample returned predicted_rating=1.0 regardless of
+    # what the LLM actually predicted, destroying RMSE completely.
+    #
+    # The review_simulator already clamps predicted_rating to 1.0-5.0
+    # before constructing this object, so the validator was redundant
+    # in success cases and destructive in failure cases.
+    #
+    # Keeping only a simple range clamp as a safety net:
+
     @model_validator(mode="after")
-    def force_mathematical_consistency(self) -> "SimulateReviewResponse":
-        """
-        Intelligently parses the reasoning chain steps. If the LLM explicitly 
-        declares a 'Final predicted rating' line, it prioritizes that anchor 
-        to ensure perfect matching between text and output floats.
-        """
-        calculated_rating = 0.0
-        chain = self.reasoning_chain
-
-        if not chain:
-            return self
-
-        # Check if the LLM explicitly stated its final intended score in the text chain
-        explicit_final_score = None
-        for step in chain:
-            step_lower = step.lower()
-            if "final predicted rating" in step_lower or "final rating" in step_lower:
-                final_numbers = re.findall(r"\d*\.\d+|\d+", step)
-                if final_numbers:
-                    explicit_final_score = float(final_numbers[0])
-                    break
-
-        if explicit_final_score is not None:
-            # 👈 Trust the LLM's explicit textual conclusion so the float matches perfectly!
-            final_clamped = round(max(1.0, min(5.0, explicit_final_score)), 1)
-        else:
-            # Fallback to cumulative calculation step-by-step
-            for step in chain:
-                step_lower = step.lower()
-                numbers = re.findall(r"[-+]?\d*\.\d+|\d+", step)
-                if not numbers:
-                    continue
-                
-                val = float(numbers[0])
-
-                if "started at" in step_lower or "baseline" in step_lower or "adjusted" in step_lower:
-                    calculated_rating = val
-                elif "+" in step or "bonus" in step_lower or "increment" in step_lower:
-                    calculated_rating += abs(val)
-                elif "-" in step or "penalty" in step_lower or "decrement" in step_lower:
-                    calculated_rating -= abs(val)
-                else:
-                    if calculated_rating == 0.0:
-                        calculated_rating = val
-            
-            final_clamped = round(max(1.0, min(5.0, calculated_rating)), 1)
-        
-        # Override the payload float to match the textual trace perfectly
-        if self.predicted_rating != final_clamped:
-            print(f"[sabi_validator] Synced predicted_rating float with chain anchor: {final_clamped}")
-            self.predicted_rating = final_clamped
-
+    def clamp_rating(self) -> "SimulateReviewResponse":
+        """Clamp predicted_rating to valid 1.0-5.0 range. Nothing more."""
+        self.predicted_rating = round(
+            max(1.0, min(5.0, float(self.predicted_rating))), 1
+        )
+        self.confidence_score = round(
+            max(0.0, min(1.0, float(self.confidence_score))), 2
+        )
         return self
+
 
 class ChatMessage(BaseModel):
     role: str
     content: str
+
 
 class RecommendRequest(BaseModel):
     user_history: UserHistory
@@ -140,6 +143,7 @@ class RecommendRequest(BaseModel):
     current_message: str = ""
     context: Optional[str] = None
     n_recommendations: Optional[int] = 10
+
 
 class RecommendationItem(BaseModel):
     rank: int
@@ -150,6 +154,7 @@ class RecommendationItem(BaseModel):
     reasoning_chain: List[str]
     cold_start_flag: bool
 
+
 class RecommendResponse(BaseModel):
     recommendations: List[RecommendationItem]
     soul_profile_summary: str
@@ -157,12 +162,14 @@ class RecommendResponse(BaseModel):
     cold_start_applied: bool
     context_applied: str
 
-# ── Evaluation Schemas ─────────────────────────────────────────────────────────
+
+# ── Evaluation Schemas ────────────────────────────────────────────────────────
 
 class RougeScores(BaseModel):
     rouge1: float
     rouge2: float
     rougeL: float
+
 
 class EvalSampleResult(BaseModel):
     user_id: Optional[str] = None
@@ -174,6 +181,7 @@ class EvalSampleResult(BaseModel):
     rmse_contribution: Optional[float] = None
     rouge: Optional[RougeScores] = None
 
+
 class EvaluationResults(BaseModel):
     rmse: float
     rouge_1: float
@@ -181,8 +189,9 @@ class EvaluationResults(BaseModel):
     rouge_l: float
     sample_count: int
     per_sample_results: List[EvalSampleResult]
-    ndcg_10: Optional[float] = None     # Task B: 30 pts
-    bert_score: Optional[float] = None  # Task A: behavioural fidelity
+    ndcg_10: Optional[float] = None
+    bert_score: Optional[float] = None
+
 
 class EvaluationResponse(BaseModel):
     sample_count: int
@@ -191,11 +200,12 @@ class EvaluationResponse(BaseModel):
     rouge_1: Optional[float] = None
     rouge_2: Optional[float] = None
     rouge_l: Optional[float] = None
-    ndcg_10: Optional[float] = None     # Task B: 30 pts
-    bert_score: Optional[float] = None  # Task A: fidelity
+    ndcg_10: Optional[float] = None
+    bert_score: Optional[float] = None
     per_sample_results: List[dict]
 
-# ── Demo Schemas ───────────────────────────────────────────────────────────────
+
+# ── Demo Schemas ──────────────────────────────────────────────────────────────
 
 class UserDemo(BaseModel):
     review_count: int
@@ -204,15 +214,18 @@ class UserDemo(BaseModel):
     recommendations: List[RecommendationItem]
     reasoning: str
 
+
 class ColdStartDemoResponse(BaseModel):
     cold_user: UserDemo
     warm_user: UserDemo
     difference_analysis: str
 
+
 class PipelineStep(BaseModel):
     step: int
     agent: str
     output: dict
+
 
 class PipelineDemoResponse(BaseModel):
     user_id: str
