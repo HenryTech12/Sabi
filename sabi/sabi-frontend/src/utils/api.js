@@ -45,7 +45,7 @@ export const getRecommendations = async (
         chat_history: actualChatHistory,
         current_message: currentMessage,
         context: actualContext,
-        n_recommendations: 10,
+        n_recommendations: 5,
     });
     return response.data;
 };

@@ -29,9 +29,12 @@ const ConversationalRecommender = ({ userHistory }) => {
         setLoading(true);
 
         try {
+        // TRUNCATE: Only send the last 4 messages (2 turns) to keep token count low
+            const limitedHistory = updatedHistory.slice(-4); 
+
             const data = await getRecommendations(
                 userHistory,
-                updatedHistory,
+                limitedHistory, // <--- Use the sliced history here
                 currentMessage
             );
 
