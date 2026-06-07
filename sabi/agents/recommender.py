@@ -436,7 +436,7 @@ Recommend {n_recommendations} items. Return ONLY valid JSON.
     # ── First attempt ─────────────────────────────────────────────────────────
     try:
         response = await client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             temperature=0.3,
             max_tokens=3000,
             messages=[
@@ -461,7 +461,7 @@ Recommend {n_recommendations} items. Return ONLY valid JSON.
     retry_error = None # Initialize this here!
     try:
         response = await client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             temperature=0.1,
             max_tokens=3000,
             messages=[
