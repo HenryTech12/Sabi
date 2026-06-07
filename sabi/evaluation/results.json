@@ -1,17 +1,17 @@
 {
   "sample_count": 10,
-  "rmse": 1.1005,
+  "rmse": 1.077,
   "avg_rouge": {
-    "rouge1": 0.0763,
-    "rouge2": 0.0059,
-    "rougeL": 0.0708
+    "rouge1": 0.0922,
+    "rouge2": 0.0063,
+    "rougeL": 0.078
   },
-  "rouge_1": 0.0763,
-  "rouge_2": 0.0059,
-  "rouge_l": 0.0708,
+  "rouge_1": 0.0922,
+  "rouge_2": 0.0063,
+  "rouge_l": 0.078,
   "rating_distribution": {
-    "mean_absolute_error": 0.85,
-    "median_error": 0.65,
+    "mean_absolute_error": 0.82,
+    "median_error": 0.6,
     "max_error": 2.2,
     "within_1_star_pct": 80.0
   },
@@ -23,11 +23,11 @@
       "predicted_rating": 5.0,
       "rating_error": 1.0,
       "actual_review": "This place was really solid. Clean environment, fast service.",
-      "predicted_review": "Nok by Alara e dey make me feel like I dey heaven omo too good abeg I no go lie the thing burst my head chai see as e sweet me na so I go dey come back",
+      "predicted_review": "Nok by Alara e dey too good abeg everything was correct I no go lie the thing burst my head chai see as e sweet me omo I go back there sha",
       "rouge": {
-        "rouge1": 0.0,
+        "rouge1": 0.0488,
         "rouge2": 0.0,
-        "rougeL": 0.0
+        "rougeL": 0.0488
       },
       "dialect_used": "Lagos Nigerian Pidgin",
       "rmse_contribution": 1.0
@@ -39,13 +39,13 @@
       "predicted_rating": 3.5,
       "rating_error": 0.5,
       "actual_review": "The food was okay but the wait time was too much.",
-      "predicted_review": "Kano Central Suya was really good I must say wallahi nothing special but nothing bad either the suya was tasty kai",
+      "predicted_review": "Kano Central Suya was really good I must say wallahi it is a place I recommend for my brothers to tell you the truth the suya was tasty kai",
       "rouge": {
-        "rouge1": 0.25,
+        "rouge1": 0.2,
         "rouge2": 0.0,
-        "rougeL": 0.25
+        "rougeL": 0.15
       },
-      "dialect_used": "Hausa influenced Northern Nigerian",
+      "dialect_used": "Hausa influenced English",
       "rmse_contribution": 0.25
     },
     {
@@ -55,13 +55,13 @@
       "predicted_rating": 4.8,
       "rating_error": 0.2,
       "actual_review": "Best Abacha in town! Very authentic taste.",
-      "predicted_review": "Nna this 042 Kitchen get correct vibes chai I swear to God the person wey cook this sabi work onye God when I taste the food I know say this thing sweet o",
+      "predicted_review": "Nna this 042 Kitchen get correct vibes chai I swear to God the person wey cook this sabi work this thing sweet o",
       "rouge": {
-        "rouge1": 0.05,
+        "rouge1": 0.0,
         "rouge2": 0.0,
-        "rougeL": 0.05
+        "rougeL": 0.0
       },
-      "dialect_used": "Igbo Nigerian",
+      "dialect_used": "Igbo Nigerian from the East",
       "rmse_contribution": 0.04000000000000007
     },
     {
@@ -71,11 +71,11 @@
       "predicted_rating": 4.2,
       "rating_error": 2.2,
       "actual_review": "Too expensive for the quality. Security was also quite rude.",
-      "predicted_review": "Nice place Wuse Luxury Lounge got good ambiance like Jabi Lake Mall I reviewed before",
+      "predicted_review": "Nice place Wuse Luxury Lounge got good ambiance like Jabi Lake Mall but more upscale I go there for meetings and chill with friends in Wuse2",
       "rouge": {
-        "rouge1": 0.0,
+        "rouge1": 0.0556,
         "rouge2": 0.0,
-        "rougeL": 0.0
+        "rougeL": 0.0556
       },
       "dialect_used": "Nigerian English with Pidgin",
       "rmse_contribution": 4.840000000000001
@@ -100,17 +100,17 @@
       "sample_id": "yelp_006",
       "user_id": "user_lagos_002",
       "actual_rating": 3.5,
-      "predicted_rating": 4.5,
-      "rating_error": 1.0,
+      "predicted_rating": 4.2,
+      "rating_error": 0.7,
       "actual_review": "Decent spot but the music was too loud. I could barely hear my friend.",
-      "predicted_review": "Yellow Chilli e dey try no be small thing I no go lie their jollof rice sweet me chai I go back there abeg Good vibes",
+      "predicted_review": "Yellow Chilli e dey try no be small thing I no go lie their jollof rice sweet me abi their suya too chai I go there for lunch the thing burst my head see as everything dey burst with flavor omo Good vibes sha",
       "rouge": {
-        "rouge1": 0.05,
+        "rouge1": 0.1379,
         "rouge2": 0.0,
-        "rougeL": 0.05
+        "rougeL": 0.1034
       },
       "dialect_used": "Lagos Nigerian Pidgin",
-      "rmse_contribution": 1.0
+      "rmse_contribution": 0.49000000000000027
     },
     {
       "sample_id": "yelp_007",
@@ -119,11 +119,11 @@
       "predicted_rating": 3.2,
       "rating_error": 0.8,
       "actual_review": "Clean and quiet. Perfect place to get some work done.",
-      "predicted_review": "Salamander Cafe was okay food quality good but service slow especially on weekends when everyone dey go Wuse2 chill",
+      "predicted_review": "Salamander Cafe was okay food was nice but service was slow I go there after work from Wuse2",
       "rouge": {
-        "rouge1": 0.0,
+        "rouge1": 0.0714,
         "rouge2": 0.0,
-        "rougeL": 0.0
+        "rougeL": 0.0714
       },
       "dialect_used": "Nigerian Pidgin and English",
       "rmse_contribution": 0.6399999999999997
@@ -135,11 +135,11 @@
       "predicted_rating": 4.2,
       "rating_error": 0.3,
       "actual_review": "Masha Allah, the Masa here is top tier.",
-      "predicted_review": "Wallahi Kano Gateway Cafe is a good place to eat to tell you the truth their suya is really good I must say",
+      "predicted_review": "Kano Gateway Cafe wallahi it was really good I must say food quality is key to tell you the truth their suya is top notch kai",
       "rouge": {
-        "rouge1": 0.129,
-        "rouge2": 0.0,
-        "rougeL": 0.129
+        "rouge1": 0.1765,
+        "rouge2": 0.0625,
+        "rougeL": 0.1765
       },
       "dialect_used": "Hausa influenced English",
       "rmse_contribution": 0.0899999999999999
@@ -151,7 +151,7 @@
       "predicted_rating": 4.5,
       "rating_error": 2.0,
       "actual_review": "The AC wasn't working and they weren't even apologetic about it.",
-      "predicted_review": "Oil Mill Lounge na correct thing my brother e be like say dem get everything wey we need God when we go there we go enjoy small chops I dey tell you",
+      "predicted_review": "my brother I dey tell you Oil Mill Lounge na correct thing small chops dey always available e be like say dem try pass Spar PH",
       "rouge": {
         "rouge1": 0.0,
         "rouge2": 0.0,
@@ -167,13 +167,13 @@
       "predicted_rating": 4.5,
       "rating_error": 0.5,
       "actual_review": "I really enjoyed the atmosphere. It felt like home.",
-      "predicted_review": "Nike Lake Resort always crowded nna this thing sweet o onye will enjoy the ambiance chai the person wey cook this sabi work I swear to God",
+      "predicted_review": "Nike Lake Resort this thing sweet o, always crowded, the person wey cook this sabi work, I swear to God, nna, chai, onye, value for money",
       "rouge": {
-        "rouge1": 0.1667,
-        "rouge2": 0.0588,
-        "rougeL": 0.1111
+        "rouge1": 0.1143,
+        "rouge2": 0.0,
+        "rougeL": 0.0571
       },
-      "dialect_used": "Igbo Nigerian from the East",
+      "dialect_used": "Igbo Nigerian",
       "rmse_contribution": 0.25
     }
   ],
