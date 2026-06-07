@@ -150,7 +150,7 @@ const ConversationalRecommender = ({ userHistory }) => {
                                                     className="scale-90 origin-top-left -mb-4"
                                                 >
                                                     <ItemCard
-                                                        recommendation={rec}
+                                                        item={rec.item}
                                                     />
                                                 </div>
                                             )
