@@ -144,7 +144,7 @@ async def simulate_review(user_history: UserHistory, item: Item) -> SimulateRevi
 
     try:
         response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             temperature=0.3,
             max_tokens=500, # Limit the output size too
             messages=[

@@ -279,7 +279,7 @@ Be specific and detailed in every field.
     # ── First attempt ─────────────────────────────────────────────────────────
     try:
         response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             temperature=0.2,
             max_tokens=1500,
             messages=[
@@ -305,7 +305,7 @@ Be specific and detailed in every field.
     # json.dumps — so the retry would overflow too.
     try:
         response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             temperature=0.1,
             max_tokens=1500,
             messages=[
