@@ -14,7 +14,7 @@ Bug Fix Applied:
 """
 
 from pydantic import BaseModel, model_validator
-from typing import Optional, List
+from typing import Optional, List, Any
 import re
 
 
@@ -94,41 +94,23 @@ class SimulateReviewResponse(BaseModel):
     confidence_score: float
     rating_drivers: List[str]
     dialect_used: str
-    soul_profile_summary: str
-    reasoning_chain: List[str]
-
-    # BUG FIX: Removed force_mathematical_consistency validator.
-    #
-    # The old validator re-parsed the reasoning_chain text to recalculate
-    # predicted_rating. This worked when the LLM succeeded but broke catastrophically
-    # when it failed (rate limit / fallback path):
-    #
-    #   reasoning_chain = [
-    #       "Both LLM attempts failed.",
-    #       "Falling back to community average: 3.3",
-    #       "Error: 429 rate_limit_exceeded..."
-    #   ]
-    #
-    # The cumulative parser found no "baseline"/"started at" keyword so
-    # calculated_rating stayed 0.0 → clamped to max(1.0, 0.0) = 1.0.
-    # Every single sample returned predicted_rating=1.0 regardless of
-    # what the LLM actually predicted, destroying RMSE completely.
-    #
-    # The review_simulator already clamps predicted_rating to 1.0-5.0
-    # before constructing this object, so the validator was redundant
-    # in success cases and destructive in failure cases.
-    #
-    # Keeping only a simple range clamp as a safety net:
+    # Change these types to Any or Dict to allow the nested objects the LLM is returning
+    soul_profile_summary: Any 
+    reasoning_chain: List[Any] 
 
     @model_validator(mode="after")
     def clamp_rating(self) -> "SimulateReviewResponse":
-        """Clamp predicted_rating to valid 1.0-5.0 range. Nothing more."""
         self.predicted_rating = round(
             max(1.0, min(5.0, float(self.predicted_rating))), 1
         )
         self.confidence_score = round(
             max(0.0, min(1.0, float(self.confidence_score))), 2
         )
+        
+        # Add these two lines to force conversion if you want to keep your UI clean:
+        self.soul_profile_summary = str(self.soul_profile_summary)
+        self.reasoning_chain = [str(item) for item in self.reasoning_chain]
+        
         return self
 
 
